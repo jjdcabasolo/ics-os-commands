@@ -26,7 +26,8 @@
 */
 
 #include "console.h"
-  
+// #include <unistd.h>
+
 /*A console mode get string function terminates
 upon receving \r */
 void getstring(char *buf,DEX32_DDL_INFO *dev)
@@ -97,8 +98,7 @@ int delfile(char *fname)
     return fdelete(f);
   };
 
-int user_fork()
-{
+int user_fork(){
     int curval = current_process->processid;
     int childready = 0, retval = 0;
     int hdl;
@@ -233,8 +233,7 @@ int user_exec(char *fname,DWORD mode,char *params)
   return 0;
  ;};
 
-int loadDLL(char *name,char *p)
-{
+int loadDLL(char *name,char *p){
  file_PCB *handle;
  int fsize; vfs_stat filestat;
  int hdl,libid;
@@ -407,8 +406,7 @@ int console_ls_sortname(vfs_node *n1,vfs_node *n2)
 };
 
 /*lists the files in the current directory to the console screen*/
-void console_ls(int style, int sortmethod)
-{
+void console_ls(int style, int sortmethod){
 
     vfs_node *dptr=current_process->workdir;
     vfs_node *buffer;
@@ -935,6 +933,19 @@ int console_execute(const char *str)
                demo_graphics();
               }
     
+            // start of our awesome project
+            else if(strcmp(u, "date") == 0){
+                // user_execp(u, u, NULL);
+                // exec(u, "date", NULL);
+                //  api_addsystemcall(0x5B,user_execp,0,0);
+                //  api_addsystemcall(0x5C,user_exec,0,0);
+                // printf("%d", user_exec(u, 0x5C, NULL));
+                // execlp(u, "asdf", NULL);
+                // system("date");
+                printf("date!.\n");   
+            }
+            // end of our awesome project
+
               else
     if (u[0]=='$')
              {

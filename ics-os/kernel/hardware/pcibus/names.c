@@ -34,7 +34,7 @@ struct nl_entry {
 
 #define HASH_SIZE 1024
 
-static inline unsigned int nl_calc_hash(int cat, int id1, int id2, int id3, int id4)
+static unsigned int nl_calc_hash(int cat, int id1, int id2, int id3, int id4)
 {
   unsigned int h;
 

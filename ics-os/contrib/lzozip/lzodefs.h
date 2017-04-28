@@ -1189,7 +1189,7 @@ extern "C" {
 #endif
 #if (LZO_CC_TURBOC && (__TURBOC__ <= 0x0295))
 #elif defined(__cplusplus)
-#  define __lzo_inline          inline
+#  define __lzo_inline          
 #elif (LZO_CC_BORLANDC && (__BORLANDC__ >= 0x0550))
 #  define __lzo_inline          __inline
 #elif (LZO_CC_CILLY || LZO_CC_GNUC || LZO_CC_LLVM || LZO_CC_PATHSCALE || LZO_CC_PGI)
@@ -1203,7 +1203,7 @@ extern "C" {
 #elif (LZO_CC_MSC && (_MSC_VER >= 900))
 #  define __lzo_inline          __inline
 #elif defined(__STDC_VERSION__) && (__STDC_VERSION__ >= 199901L)
-#  define __lzo_inline          inline
+#  define __lzo_inline          
 #endif
 #if (LZO_CC_GNUC >= 0x030200ul)
 #  define __lzo_forceinline     __inline__ __attribute__((__always_inline__))
