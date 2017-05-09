@@ -32,7 +32,6 @@
 #define SORT_NAME 0
 #define SORT_SIZE 1
 
-
 int console_first = 0;
 void console_main();
 void getstring(char *buf,DEX32_DDL_INFO *dev);
@@ -55,5 +54,5 @@ void console_ls(int style, int sortmethod);
 int console_execute(const char *str);
 int console_new();
 void console_main();
-
+// int execlp (const char *fname, const char mode,char *params);
 #endif

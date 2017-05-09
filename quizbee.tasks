@@ -1,0 +1,39 @@
+CODE:
+header():
+☐ add border to the title
+☐ make buttons for menu options
+
+category():
+☐ lagyan ng button yung choices
+
+questionPanel():
+☐ lagyan ng magandang border yung questionPanel
+☐ buttons for choices
+
+highScore():
+☐ lagyan ng panel color yung list ng category 1 & 2
+
+CONTENTS:
+☐ use cmsc 11 project as guide @critical
+    ☐ high scores (top 5)
+☐ isip na ng categories (2) @high 
+    ☐ generate na ng mga tanong 
+    ☐ syempre pati ng mga sagot :(
+☐ other features (powerups, etc.) @high 
+☐ file reading
+    ☐ questions
+    ☐ answers
+    ☐ high scores
+
+FEATURES:
+☐ 2 categories lang
+    ☐ 3 levels of difficulty
+        ☐ easy: 1pt
+        ☐ average: 2pts
+        ☐ difficult: 3pts
+    ☐ 3 questions per difficulty
+        ☐ max score: 18 pts
+☐ debatable powerups
+    ☐ pass 
+        ☐ automatically tama siya sa tanong na yun pag ginamit niya
+        ☐ one charge
