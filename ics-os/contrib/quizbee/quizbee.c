@@ -1,5 +1,6 @@
 #include "../../sdk/dexsdk.h"
 #include "../../sdk/time.h"
+#include "quizbee.h"
 
 void set_coordinates(int x, int y); //initialize bulb coordinates
 void setup_level(); //self explanatory
@@ -12,37 +13,28 @@ void edit_board(); // update selected and previously selected bulb colors
 void erase(); //basically covers an area with a black rectangle
 
 //displays menus
-void header();
+void mainMenu();
 void category();
 void questionPanel();
+void mayTamaKa();
+void betterLuckNextTime();
 void highScore();
+void wrongInput();
 
-/* constants */
-#define maxrow 5
-#define maxcol 5
-#define max_level 6
-#define pause_length 25
-
-#define on 1
-#define son 2
-#define off 3
-#define soff 4
-#define flip 'l'
-#define up_key 'w'
-#define down_key 's'
-#define left_key 'a'
-#define right_key 'd'
-#define quit 'x'
-#define reset 'r'
-#define yes 'y'
-#define no 'n'
+// CONSTANTS
+// main menu
 #define start '1'
-#define quit_game '2'
+#define high_score '2'
+#define quit_game '3'
 
 // categories
-#define category1 '3'
-#define category2 '4'
-#define return_main_menu '5'
+#define category1 '4'
+#define category2 '5'
+#define return_main_menu '6'
+
+// number of questions per category
+#define question_limit 5
+#define quit 'g'
 
 #define YELLOW 54
 #define PALE_YELLOW 62
@@ -51,32 +43,35 @@ void highScore();
 #define GRAY 56
 #define WHITE 63
 
-#define X_coord 85
-#define Y_coord 35
+#define BLACK 0
+#define BLUE 1
+#define GREEN 2
+#define CYAN 3
+#define RED 4
+#define MAGENTA 5
+#define BROWN 6
+#define LIGHTGRAY 7
+#define DARKGRAY 8
+#define LIGHTBLUE 9
+#define LIGHTGREEN 10
+#define LIGHTCYAN 11
+#define LIGHTRED 12
+#define LIGHTMAGENTA 13
+#define YELLOW 14
+#define BLINK 128
 
-/* global variables */
-int row, col, oldrow=0, oldcol=0;
-int flips=0, remaining_bulb;
-int level, count=0, hour=0, min=0;
-char board[maxrow][maxcol];
-int bulbs_x[maxrow][maxcol];
-int bulbs_y[maxrow][maxcol];
-
-int main(){
+int main(){ 
     char keypress = start;
 	int i, j;
 	char str[15];
 	int champion = 0;
 
 	set_graphics(VGA_320X200X256);
-  	set_coordinates(X_coord, Y_coord); //initialize bulb coordinates
 
 	do{
         erase(1,1,400,220);
 
-        header(); //print menu
-        // level = 1; //initialize level
-        // champion = 0; //falsify championhood
+        mainMenu(); //print menu
         keypress=(char)getch();
         erase(1,1,400,220); //erase menu
 
@@ -88,192 +83,37 @@ int main(){
                 erase(1,1,400,220); //erase menu
 
                 if(keypress == category1){
-                    // do{
-                    //     if(keypress == start){
-                    //         setup_level(); 
-                    //         row=0;
-                    //         col=0;
-                    //         flips=0;
+                    
+                    // traverse the question list
+                    for(i = 0; i < question_limit; i++){
+                        erase(1,1,400,220); //erase menu
 
-                    //         //update level display
-                    //         erase(25,125,40,30);
-                    //         write_text("0",25,125,WHITE,0);
+                        do{
+                            questionPanel();
+                            keypress=(char)getch();
+                            char rightAnswer = 'a';
+                            char wrongAnswer = 'b';
 
-                    //     }		
-                    //     else{
-                    //         print_board(X_coord, Y_coord);
-                    //     }
-
-                    //     // main game - pressing lights
-                    //     do{
-                    //         if (keypress=(char)getch()){
+                            if(keypress == rightAnswer) mayTamaKa();
+                            else if(keypress == wrongAnswer) betterLuckNextTime();
+                            else wrongInput();
                             
-                    //             // update selected bulb
-                    //             if(keypress==right_key){
-                    //                 oldrow = row;
-                    //                 oldcol = col;
-                    //                 col = (col + 1) % maxcol;
-                    //             }
-                                
-                    //             else if(keypress==left_key){
-                    //                 oldrow = row;
-                    //                 oldcol = col;
-                    //                 if(col <= 0)
-                    //                     col = maxcol - 1;
-                    //                 else
-                    //                     col--;
-                    //             }
-                                
-                    //             else if(keypress==up_key){
-                    //                 oldrow = row;
-                    //                 oldcol = col;keypress=(char)getch();
-                    //                 if(row <= 0)
-                    //                     row = maxrow - 1;
-                    //                 else
-                    //                     row--;
-                    //             }
-                                
-                    //             else if(keypress==down_key){
-                    //                 oldrow = row;
-                    //                 oldcol = col;
-                    //                 row = (row + 1) % maxrow;
-                    //             }
-                                
-                    //             else if(keypress == flip){				
-                    //                 flips++;
-                    //                 erase(25,125,30,30);
-                    //                 sprintf(str,"%d",flips);
-                    //                 write_text(str,25,125,WHITE,0);
-                                    
-                    //                 // flip bulbs
-                                
-                    //                 // selected bulb
-                    //                 if(board[row][col] == son){
-                    //                     board[row][col] = soff;
-                    //                     remaining_bulb--;
-                    //                     flip_fxn(row, col);
-                    //                 }
-                    //                 else{
-                    //                     board[row][col] = son;
-                    //                     remaining_bulb++;
-                    //                     flip_fxn(row, col);
-                    //                 }
-                                    
-                    //                 // top
-                    //                 if(row -1 >= 0){
-                    //                     if(board[row-1][col] == on){
-                    //                         board[row-1][col] = off;
-                    //                         remaining_bulb--;
-                    //                         flip_fxn(row-1, col);
-                    //                     }
-                    //                     else{
-                    //                         board[row-1][col] = on;
-                    //                         remaining_bulb++;
-                    //                         flip_fxn(row-1, col);
-                    //                     }
-                    //                 }
-                                    
-                    //                 // down
-                    //                 if(row + 1 < maxrow){
-                    //                     if(board[row+1][col] == on){
-                    //                         board[row+1][col] = off;
-                    //                         remaining_bulb--;
-                    //                         flip_fxn(row+1, col);
-                    //                     }
-                    //                     else{
-                    //                         board[row+1][col] = on;
-                    //                         remaining_bulb++;
-                    //                         flip_fxn(row+1, col);
-                    //                     }
-                    //                 }
-                                    
-                    //                 // left
-                    //                 if(col -1 >= 0){
-                    //                     if(board[row][col-1] == on){
-                    //                         board[row][col-1] = off;
-                    //                         remaining_bulb--;
-                    //                         flip_fxn(row, col-1);
-                    //                     }
-                    //                     else{
-                    //                         board[row][col-1] = on;
-                    //                         remaining_bulb++;
-                    //                         flip_fxn(row, col-1);
-                    //                     }
-                    //                 }
-                                    
-                    //                 // right
-                    //                 if(col + 1 < maxcol){
-                    //                     if(board[row][col+1] == on){
-                    //                         board[row][col+1] = off;
-                    //                         remaining_bulb--;
-                    //                         flip_fxn(row, col+1);
-                    //                     }
-                    //                     else{
-                    //                         board[row][col+1] = on;
-                    //                         remaining_bulb++;
-                    //                         flip_fxn(row, col+1);
-                    //                     }
-                    //                 }
-                                    
-                    //             }
-                                
-                    //             if(remaining_bulb <= 0){
+                        }while(keypress != 'a' && keypress != 'b' && keypress != 'c' && keypress != 'd' && keypress != 'q');
 
-                    //                 level++; //update level
-                    //                 if(level==max_level){ //finished all puzzles
 
-                    //                     write_text("Congratulations!",89,160,YELLOW,0);
-                    //                     write_text("You finished all levels.",65,170,YELLOW,0);
-                    //                     write_text("(Press any key)",101, 180,YELLOW,0);
-                    //                     keypress=(char)getch();
-                    //                     erase(1,1,350,280); //clear screen
-                    //                     champion=1; //player is now champion
+                        if(keypress == quit){
+                            break;
+                            keypress == return_main_menu;
+                        }
+                    }
 
-                    //                 }else{ //finished a puzzle
-                    //                     write_text("Congratulations!",89,160,WHITE,0);
-                    //                     write_text("Press any key",101, 170,WHITE,0);
-                    //                     keypress=(char)getch();
-                    //                     erase(80,160,150,40); //erase congratulations
-                    //                     keypress = start;
-                    //                 }
-                    //                 break;
-                    //             }
-                                
-                    //             // update the display of the selected and previously selected
-                    //             if(keypress==right_key || keypress==left_key || keypress==up_key || keypress==down_key){
-                    //                 board[row][col] = board[row][col] == on? son: soff;
-                    //                 board[oldrow][oldcol] = board[oldrow][oldcol] == son? on: off;					
-                    //                 edit_board();
-                    //             }
-                    //         }			
-                                
-                    //     } while (keypress != quit && keypress != reset && champion!=1);
-                    //         //continue while player is not quitting, restarting or champion
-
-                    //     if(champion==1){
-                    //         keypress = yes;
-                    //     }
-                    //     else if(keypress == quit){
-                    //         //prompt confirmation then erase message
-                    //         write_text("Do you want to exit? y/n ",60,160,WHITE,0); 
-                    //         keypress=(char)getch();
-                    //         erase(60,160,220,40);			
-                    //     }
-                    //     else if(keypress == reset){
-                    //         //prompt confirmation then erase message
-                    //         write_text("Do you want to restart? y/n ",50,160,WHITE,0);
-                    //         keypress=(char)getch();
-                    //         if(keypress == yes) keypress = start;
-                    //         erase(50,160,260,40);			
-                    //     }
-                    // } while (keypress != yes);
                 }
                 else if(keypress == category2){
                 }
 
             }while(keypress != return_main_menu);
         }
-        else if(keypress == highScore){
+        else if(keypress == high_score){
             // print highscore
             highScore();       
             keypress=(char)getch();
@@ -287,61 +127,115 @@ int main(){
 }
 
 // ---- MENUS ----
-// displays header
-void header(){
+// displays mainMenu
+void mainMenu(){
+    // borders
+    int i = 0, j = 0;
+    for (i=10;i<285;i++)write_pixel(i+10,20,PALE_YELLOW); // top
+    for (i=10;i<285;i++)write_pixel(i+10,21,PALE_YELLOW); // top
+
+    for (j=0;j<80;j++)write_pixel(10+10,j+20,PALE_YELLOW); // left
+    for (j=0;j<80;j++)write_pixel(10+11,j+20,PALE_YELLOW); // left
+
+    for (j=0;j<80;j++)write_pixel(285+10,j+20,PALE_YELLOW); // right
+    for (j=0;j<80;j++)write_pixel(285+11,j+20,PALE_YELLOW); // right
+
+    for (i=10;i<287;i++)write_pixel(i+10,100,PALE_YELLOW); // bottom
+    for (i=10;i<287;i++)write_pixel(i+10,101,PALE_YELLOW); // bottom
+
     // title
 	write_text("Quiz Bee!",120,40,WHITE,1);
-    // void write_text(char *str, int x, int y, int color,int size){}
 
-	//menu options
-	write_text("1 - Start",40,160,WHITE,0); 
-	write_text("2 - Quit",200,160,WHITE,0);
+	//menu options :: borders
+    // for (i=30;i<120;i++)write_pixel(i,150,ROYAL_BLUE); // top
+    // for (i=30;i<120;i++)write_pixel(i,151,ROYAL_BLUE); // top
+    // for (j=150;j<20;j++)write_pixel(20,j,ROYAL_BLUE); // left
+    // for (j=150;j<20;j++)write_pixel(21,j,ROYAL_BLUE); // right
+    // for (j=130;j<20;j++)write_pixel(120+10,j+20,ROYAL_BLUE); // left
+    // for (j=130;j<20;j++)write_pixel(120+11,j+20,ROYAL_BLUE); // right
+    // for (i=120;i<285;i++)write_pixel(i+10,20,PALE_YELLOW); // bottom
+	write_text("1 - Start",120,120,WHITE,0); 
+
+    // for (i=190;i<120;i++)write_pixel(i,150,ROYAL_BLUE); // top
+    // for (i=190;i<120;i++)write_pixel(i,151,ROYAL_BLUE); // top
+    // for (j=150;j<20;j++)write_pixel(20,j,ROYAL_BLUE); // left
+    // for (j=150;j<20;j++)write_pixel(21,j,ROYAL_BLUE); // right
+	write_text("2 - High Score",100,140,WHITE,0);
+
+    write_text("3 - Quit",125,160,WHITE,0);
 }
 
 
 // displays categories
 void category(){
     // prompt
-	write_text("Choose a category",120,40,WHITE,1);
+	write_text("Choose a category",90,40,WHITE,1);
 
     // pick categories
-	write_text("4 - Category 1",120,100,WHITE,0); 
-	write_text("3 - Category 2",120,120,WHITE,0); 
-	write_text("5 - Return to main menu",120,140,WHITE,0);
+	write_text("4 - Pokemon",50,100,YELLOW,0); 
+	write_text("5 - Movies",50,120,ROYAL_BLUE,0); 
+	write_text("6 - Return to main menu",50,140,WHITE,0);
 }
 
 void questionPanel(){
     // tanong
-	write_text("Question #1",120,40,WHITE,1);
+	write_text("Question #1",20,20,WHITE,1);
+
+    // yung mismong tanong
+    // three liner questions lang :( - 30 characters
+    char line1[] = "asdfkjsahdf dfskj hdsakf rghdf";
+    char line2[] = "as--dsf-sad-dere=--93746 rghdf";
+    char line3[] = "7823489gdakfy7906qw uiyadsef09";
+    char line4[] = "asdfkjsahdf d3fskj hsakf rghdf";
+    char line5[] = "asdfkjsahdf dfskj 4hsakf rghdf";
+    char line6[] = "asdfkjsahdf dfskj hdsakf rghdf";
+    char line7[] = "asdfkjsahdf dfskj hdsakf rghdf";
+    char line8[] = "asdfkjsahdf dfskj hdsakf rghdf";
+    write_text(line1,20,50,WHITE,-1);
+    write_text(line2,20,60,WHITE,-1);
+    write_text(line3,20,70,WHITE,-1);
+    write_text(line4,20,80,WHITE,-1);
+    write_text(line5,20,90,WHITE,-1);
+    write_text(line6,20,100,WHITE,-1);
+    write_text(line7,20,110,WHITE,-1);
+    write_text(line8,20,120,WHITE,-1);
 
     // sagot
-	write_text("4 - Category 1",120,100,WHITE,0); 
-	write_text("3 - Category 2",120,120,WHITE,0); 
-	write_text("5 - Return to main menu",120,140,WHITE,0);   
-	write_text("5 - Return to main menu",120,140,WHITE,0);   
+	write_text("a. Answer 1",20,140,WHITE,0); 
+	write_text("b. Answer 2",20,150,WHITE,0); 
+	write_text("c. Answer 3",180,140,WHITE,0);   
+	write_text("d. Answer 4",180,150,WHITE,0);   
+
+    // score
+    write_text("Score:",20,170,WHITE,0);   
+    int score = 0;
+    write_text((char)score,80,170,WHITE,0);   
+    
+    // quitting station
+    write_text("q - Quit game",165,170,WHITE,0);   
 }
 
 void highScore(){
-    // header
+    // mainMenu
 	write_text("High scores!",120,40,WHITE,1);
 
     // catogory 1
 	write_text("Category title 1",120,40,WHITE,1);
     // top 5
-	write_text("1 - Category 1",120,100,WHITE,0); 
-	write_text("2 - Category 2",120,120,WHITE,0); 
-	write_text("3 - Return to main menu",120,140,WHITE,0);   
-	write_text("4 - Return to main menu",120,140,WHITE,0);   
-	write_text("5 - Return to main menu",120,140,WHITE,0);   
+	write_text("1 - Player 1",120,100,WHITE,0); 
+	write_text("2 - Player 1",120,120,WHITE,0); 
+	write_text("3 - Player 1",120,140,WHITE,0);   
+	write_text("4 - Player 1",120,140,WHITE,0);   
+	write_text("5 - Player 1",120,140,WHITE,0);   
 
     // catogory 2
 	write_text("Category title 2",120,40,WHITE,1);
     // top 5
-	write_text("1 - Category 1",120,100,WHITE,0); 
-	write_text("2 - Category 2",120,120,WHITE,0); 
-	write_text("3 - Return to main menu",120,140,WHITE,0);   
-	write_text("4 - Return to main menu",120,140,WHITE,0);   
-	write_text("5 - Return to main menu",120,140,WHITE,0);   
+    write_text("1 - Player 1",120,100,WHITE,0); 
+    write_text("2 - Player 1",120,120,WHITE,0); 
+    write_text("3 - Player 1",120,140,WHITE,0);   
+    write_text("4 - Player 1",120,140,WHITE,0);   
+    write_text("5 - Player 1",120,140,WHITE,0);   
 }
 
 void erase(int x, int y, int w, int h){ //basically covers an area with a black rectangle 
@@ -353,403 +247,59 @@ void erase(int x, int y, int w, int h){ //basically covers an area with a black 
     }
 }
 
+void wrongInput(){
+    erase(1,1,400,220); //erase menu
 
-void flip_fxn(int x, int y){
-	light(x, y, bulbs_x[x][y], bulbs_y[x][y]); 
+    write_text("Ayusin ang input :(",80,80,GRAY,1);
+    write_text("a, b, c, d, or q",90,100,WHITE,0);
+    write_text("lang ang choices.",90,110,WHITE,0);
+    
+    write_text("Press any key to continue...",35,150,GRAY,0);
+    char stop = (char)getch();    
 }
 
-void set_coordinates(int x, int y){ //initialize bulb coordinates
-	int i, j, a, b;
-	
-	a = x;
-	b = y;
-	
-	for(i=0; i<maxrow; i++, b+=24){
-		for(j=0; j<maxcol; j++, a+=31){
-			bulbs_x[i][j] = a;
-			bulbs_y[i][j] = b;
-		}
-		a=x;
-	}
+void mayTamaKa(){
+    erase(1,1,400,220); //erase menu
+
+    write_text("Correct!!!",120,80,YELLOW,1);
+    write_text("You have earned",40,100,WHITE,0);
+
+    char score[] = "1";
+    write_text(score,190,100,WHITE,0);
+
+    write_text("points.",220,100,WHITE,0);
+    
+    write_text("Press any key to continue...",35,150,GRAY,0);
+    char stop = (char)getch();
 }
 
-void setup_level(){
- 
-	int i, j;
-   
-	for(i=0; i<maxrow; i++)
-		for(j=0; j<maxcol; j++)
-			board[i][j]= off;
+void betterLuckNextTime(){
+    erase(1,1,400,220); //erase menu
 
-	switch(level){
-	
-		case 1:			
-			board[0][0] = on;
-			board[0][1] = on;
-			board[0][3] = on;
-			board[0][4] = on;
+    write_text("Wrong!!!",120,80,RED,1);
+    write_text("The correct answer is",50,100,WHITE,0);
 
-			board[1][0] = on;
-			board[1][2] = on;
-			board[1][4] = on;
+    char score[] = "a. Answer 1";
+    write_text(score,100,110,WHITE,0);
 
-			board[2][1] = on;
-			board[2][2] = on;
-			board[2][3] = on;
-
-			board[3][0] = on;
-			board[3][2] = on;
-			board[3][4] = on;
-
-			board[4][0] = on;
-			board[4][1] = on;
-			board[4][3] = on;
-			board[4][4] = on;
-			break;
-
-		case 2:
-			
-			board[0][1] = on;
-			board[0][3] = on;
-			
-			board[1][0] = on;
-			board[1][1] = on;
-			board[1][3] = on;
-			board[1][4] = on;
-			
-			board[2][1] = on;
-			board[2][3] = on;
-			
-			board[3][0] = on;
-			board[3][2] = on;
-			board[3][4] = on;
-			
-			board[4][0] = on;
-			board[4][2] = on;
-			board[4][4] = on;
-			break;
-	
-		case 3:
-		
-			board[0][0] = on;
-			board[0][4] = on;
-			
-			board[1][0] = on;
-			board[1][1] = on;
-			board[1][3] = on;
-			board[1][4] = on;
-			
-			board[2][2] = on;
-			
-			board[3][0] = on;
-			board[3][2] = on;
-			
-			board[4][0] = on;
-			board[4][2] = on;
-			board[4][3] = on;
-			break;
-
-		case 4:
-		
-			board[0][0] = on;
-			board[0][1] = on;
-			board[0][3] = on;
-			board[0][4] = on;
-						
-			board[2][0] = on;
-			board[2][1] = on;
-			board[2][3] = on;
-			board[2][4] = on;
-			
-			board[3][4] = on;
-			
-			board[4][0] = on;
-			board[4][1] = on;
-			break;
-			
-		case 5:
-			
-			board[0][0] = on;
-			board[0][1] = on;
-			board[0][2] = on;
-			board[0][3] = on;
-			board[0][4] = on;
-			
-			board[1][0] = on;
-			board[1][1] = on;
-			board[1][2] = on;
-			board[1][3] = on;
-			board[1][4] = on;
-			
-			board[2][0] = on;
-			board[2][1] = on;
-			board[2][2] = on;
-			board[2][3] = on;
-			board[2][4] = on;
-			
-			board[3][0] = on;
-			board[3][1] = on;
-			board[3][2] = on;
-			board[3][3] = on;
-			board[3][4] = on;
-			
-			board[4][0] = on;
-			board[4][1] = on;
-			board[4][2] = on;
-			board[4][3] = on;
-			board[4][4] = on;
-			break;
-
-		case 6: board[0][3] = on;
-			board[0][4] = on;
-			board[1][3] = on;
-			board[1][4] = on;
-			board[3][0] = on;
-			board[3][1] = on;
-			board[4][0] = on;
-			board[4][1] = on;
-			break;
-
-		case 7: board[1][1] = on;
-			board[1][2] = on;
-			board[1][3] = on;
-			board[2][0] = on;
-			board[2][1] = on;
-			board[2][2] = on;
-			board[2][3] = on;
-			board[2][4] = on;
-			board[3][1] = on;
-			board[3][2] = on;
-			board[3][3] = on;
-			break;
-
-		case 8: board[1][1] = on;
-			board[1][2] = on;
-			board[1][3] = on;
-			board[2][1] = on;
-			board[2][2] = on;
-			board[2][3] = on;
-			board[3][1] = on;
-			board[3][2] = on;
-			board[3][3] = on;
-			break;
-
-		case 9: 
-
-			board[0][0] = on;
-			board[0][1] = on;
-			board[0][3] = on;
-			board[0][4] = on;
-			board[1][0] = on;
-			board[1][1] = on;
-			board[1][3] = on;
-			board[1][4] = on;
-			board[3][0] = on;
-			board[3][1] = on;
-			board[3][3] = on;
-			board[3][4] = on;
-			board[4][0] = on;
-			board[4][1] = on;
-			board[4][3] = on;
-			board[4][4] = on;
-			break;
-
-		case 10:
-			board[0][0] = on;
-			board[0][1] = on;
-			board[0][2] = on;
-			board[0][3] = on;
-			board[0][4] = on;
-			board[1][1] = on;
-			board[1][2] = on;
-			board[1][3] = on;
-			board[2][2] = on;
-			board[4][0] = on;
-			board[4][1] = on;
-			board[4][2] = on;
-			board[4][3] = on;
-			board[4][4] = on;
-			board[3][1] = on;
-			board[3][2] = on;
-			board[3][3] = on;
-			break;
-	}	
-	
-	// counts the number of bulbs that are turned on
-	remaining_bulb = 0;
-	for(i=0; i<maxrow; i++)
-		for(j=0; j<maxcol; j++)
-			if(board[i][j] == on)
-				remaining_bulb++;
-	
-	// starting point
-	board[0][0] = board[0][0] == on? son : soff;
-
-	erase(190,5,30,20); //erase menu
-	print_board(85, 35);
+    write_text("Press any key to continue...",35,150,GRAY,0);
+    char stop = (char)getch();
 }
 
-void gray(int x, int y){ //prints a gray bulb socket 
-    int i;
-	for (i=8;i<18;i++)write_pixel(i+x,0+y,56);
-	for (i=6;i<20;i++)write_pixel(i+x,1+y,56);
-	for (i=4;i<21;i++)write_pixel(i+x,2+y,56);
-	for (i=3;i<22;i++)write_pixel(i+x,3+y,56);
-	for (i=2;i<23;i++)write_pixel(i+x,4+y,56);
-	for (i=1;i<24;i++)write_pixel(i+x,5+y,56);
-	for (i=1;i<25;i++)write_pixel(i+x,6+y,56);
-	for (i=0;i<25;i++)write_pixel(i+x,7+y,56);
-	for (i=0;i<25;i++)write_pixel(i+x,8+y,56);
-	for (i=0;i<25;i++)write_pixel(i+x,9+y,56);
-	for (i=0;i<25;i++)write_pixel(i+x,10+y,56);
-	for (i=0;i<25;i++)write_pixel(i+x,11+y,56);
-	for (i=1;i<24;i++)write_pixel(i+x,12+y,56);
-	for (i=1;i<24;i++)write_pixel(i+x,13+y,56);
-	for (i=2;i<23;i++)write_pixel(i+x,14+y,56);
-	for (i=3;i<22;i++)write_pixel(i+x,15+y,56);
-	for (i=5;i<20;i++)write_pixel(i+x,16+y,56);
-	for (i=7;i<18;i++)write_pixel(i+x,17+y,56);
-	for (i=9;i<15;i++)write_pixel(i+x,18+y,56);
-
-}
-
-void light(int r, int c, int x, int y){ //prints a bulb light 
-	int i, color;
-	
-	switch(board[r][c]){ //sets the bulb's color
-		case on: color = YELLOW; break;
-		case son: color = WHITE; break;
-		case off: color = DARK_BLUE; break;
-		case soff: color = BLUE; break;
-	}
-	
-	for (i=9;i<17;i++)write_pixel(i+x,2+y,color);
-	for (i=7;i<19;i++)write_pixel(i+x,3+y,color);
-	for (i=5;i<20;i++)write_pixel(i+x,4+y,color);
-	for (i=4;i<21;i++)write_pixel(i+x,5+y,color);
-	for (i=4;i<21;i++)write_pixel(i+x,6+y,color);
-	for (i=3;i<22;i++)write_pixel(i+x,7+y,color);
-	for (i=3;i<22;i++)write_pixel(i+x,8+y,color);
-	for (i=4;i<21;i++)write_pixel(i+x,9+y,color);
-	for (i=4;i<21;i++)write_pixel(i+x,10+y,color);
-	for (i=5;i<20;i++)write_pixel(i+x,11+y,color);
-	for (i=7;i<18;i++)write_pixel(i+x,12+y,color);
-	for (i=9;i<17;i++)write_pixel(i+x,13+y,color);
-}
-
-void print_bulb(int r, int c, int x, int y){ //print a bulb 
-
-	gray(x, y);
-	light(r, c, x, y);
-	
-}
-
-void print_board(int x, int y){ //set up initial board 
-
-	int i, j, a, b;
- 	a=x;
- 	b=y;
- 	char str[15];
-
-	//display level
-   	write_text("Level",135,5,WHITE,0); 
-	sprintf(str,"%d",level);
-   	write_text(str,190,5,WHITE,0);
-
-	//print the 25 bulbs
-	for(i=0; i<maxrow; i++, b+=24){
-		for(j=0; j<maxcol; j++, a+=31)
-			print_bulb(i, j, a, b);
-		a=x;
-	}
-	
-	//display legend
-	write_text("Up-W",5,35,WHITE,0);
-	write_text("Dn-S",5,45,WHITE,0);
-	write_text("Lf-A",5,55,WHITE,0);
-	write_text("Rt-D",5,65,WHITE,0);
-	
-	write_text("Flip-L",5,75,WHITE,0);
-	write_text("Exit-X",5,85,WHITE,0);
-	write_text("Reset-R",5,95,WHITE,0);
-
-	//show number of flips
-	write_text("Flips:",5,115,WHITE,0);
-	
-}
-
-// update selected and previously selected bulb colors 
-void edit_board(){
-	light(oldrow, oldcol, bulbs_x[oldrow][oldcol], bulbs_y[oldrow][oldcol]);
-	light(row, col, bulbs_x[row][col], bulbs_y[row][col]);
-}
-
-void light2(int x, int y, int color){ //prints bulb light without checking,
-	int i;			      //explicit color defining	
-	
-	for (i=9;i<17;i++)write_pixel(i+x,2+y,color);
-	for (i=7;i<19;i++)write_pixel(i+x,3+y,color);
-	for (i=5;i<20;i++)write_pixel(i+x,4+y,color);
-	for (i=4;i<21;i++)write_pixel(i+x,5+y,color);
-	for (i=4;i<21;i++)write_pixel(i+x,6+y,color);
-	for (i=3;i<22;i++)write_pixel(i+x,7+y,color);
-	for (i=3;i<22;i++)write_pixel(i+x,8+y,color);
-	for (i=4;i<21;i++)write_pixel(i+x,9+y,color);
-	for (i=4;i<21;i++)write_pixel(i+x,10+y,color);
-	for (i=5;i<20;i++)write_pixel(i+x,11+y,color);
-	for (i=7;i<18;i++)write_pixel(i+x,12+y,color);
-	for (i=9;i<17;i++)write_pixel(i+x,13+y,color);
-}
-
-bulb_row2(int x, int y){ //displays header top and bottom borders
-	gray(0+x,0+y);
-	light2(0+x,0+y,BLUE);
-
-	gray(31+x,0+y);
-	light2(31+x,0+y,YELLOW);
-
-	gray(62+x,0+y);
-	light2(62+x,0+y,BLUE);
-
-	gray(93+x,0+y);
-	light2(93+x,0+y,YELLOW);
-
-	gray(124+x,0+y);
-	light2(124+x,0+y,BLUE);
-
-	gray(155+x,0+y);
-	light2(155+x,0+y,YELLOW);
-
-	gray(186+x,0+y);
-	light2(186+x,0+y,BLUE);
-
-	gray(217+x,0+y);
-	light2(217+x,0+y,YELLOW);
-
-	gray(248+x,0+y);
-	light2(248+x,0+y,BLUE);
-
-	gray(279+x,0+y);
-	light2(279+x,0+y,YELLOW);
-
-
-}
-
-//displays header left and right borders
-bulb_pair1(int x, int y){ 
-
-	gray(0+x,0+y);
-	light2(0+x,0+y,YELLOW);
-
-	gray(279+x,0+y);
-	light2(279+x,0+y,BLUE);
-}
-
-bulb_pair2(int x, int y){
-
-	gray(0+x,0+y);
-	light2(0+x,0+y,BLUE);
-
-	gray(279+x,0+y);
-	light2(279+x,0+y,YELLOW);
-}
+// filereading @ dexsdk.h
+// FILE *openfile(const char  *filename,int mode);
+// int feof(FILE *f);
+// FILE *fopen(const char *filename,const char *s);
+// int fgetc (FILE *stream);
+// char *fgets(char *s, int n, FILE* f);
+// int fread(const void *buf,int itemsize,int noitems,FILE* fhandle);
+// int fwrite(const void *buf,int itemsize,int noitems,FILE* fhandle);
+// char fputc(char c,FILE *f);
+// int fclose(FILE *stream);
+// int fflush (FILE *stream);
+// char *fseek(FILE* f,long x,int y);
+// long int ftell(FILE *stream);
+// int closefile(FILE* fhandle);
+// int remove(char *filename);
+// int mkdir (const char *filename, mode_t mode);
+// int copyfile(const char *src, const char *dest);
