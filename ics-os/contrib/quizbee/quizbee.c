@@ -165,10 +165,12 @@ int main(){
                             if(keypress == rightAnswer){
                                 totalScore = mayTamaKa(totalScore, increment);
                                 randomNumber++;
+                                break;
                             }
                             else if(keypress == wrongAnswer1 || keypress == wrongAnswer2 || keypress == wrongAnswer3){
                                 betterLuckNextTime();
                                 randomNumber++;
+                                break;
                             }
                             else if(keypress != 'a' && keypress != 'b' && keypress != 'c' && keypress != 'd' && keypress != 'q') wrongInput();
                             
@@ -350,6 +352,8 @@ char questionPanel(FILE * fp, int count, char difficulty[], int color, int score
                 fgets(correctAnswer,2,fp);
                 correctAnswer[1] = '\0';
                 write_text(correctAnswer,210,160,RED,0);   
+
+                break;
             }
             else{
                 char dummyQuestion[350];
