@@ -356,17 +356,17 @@ char questionPanel(FILE * fp, int count, char difficulty[], int color, int score
                 break;
             }
             else{
-                char dummyQuestion[350];
-                fgets(dummyQuestion,350,fp);
+                char dummyQuestion[264];
+                fgets(dummyQuestion,264,fp);
                 char answerCatch[13];
                 fgets(answerCatch,13,fp);
                 fgets(answerCatch,13,fp);
                 fgets(answerCatch,13,fp);
                 fgets(answerCatch,13,fp);
+                // fgets(answerCatch,13,fp);
                 fgets(answerCatch,13,fp);
-                fgets(answerCatch,13,fp);
-                fgets(answerCatch,13,fp);
-                fgets(answerCatch,13,fp);
+                // fgets(answerCatch,13,fp);
+                // fgets(answerCatch,13,fp);
                 char correctAnswerCatch[1];
                 fgets(correctAnswerCatch,1,fp);   
             }
@@ -404,7 +404,7 @@ void enterName(){
         char keypress=(char)getch();
         // name[k] = keypress;
 
-        // if(keypress == 1) break;        
+        if(keypress == 10) break;        
         if(keypress == 'a') write_text("A", j+=10 , 90, WHITE, 1);
         else if(keypress == 'b') write_text("B", j+=10 , 90, WHITE, 1);
         else if(keypress == 'c') write_text("C", j+=10 , 90, WHITE, 1);
