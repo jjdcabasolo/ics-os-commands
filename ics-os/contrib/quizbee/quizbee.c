@@ -83,9 +83,12 @@ int main(){
 
 	do{
         keypress = mainMenu(); //print menu
+        
         if(keypress == start){
             do{
                 keypress = category();             
+                categoryChar = keypress;
+                
                 if(keypress == category1 || keypress == category2){
                     enterName();
                     int totalScore = 0, increment = 0, quitting = 0, limit = 0;
@@ -96,33 +99,33 @@ int main(){
                         if( i == 5 ) increment = avePanel();
                         if( i == 10 ) increment = ggPanel();
 
+                        // chooses what file to read according to category and difficulty
+                        if(i <= 4 && categoryChar == '1'){
+                            fp = fopen("pez.txt", "r");
+                            limit = pkmn_ez_count;
+                        }
+                        else if(i <= 9 && categoryChar == '1'){
+                            fp = fopen("pave.txt", "r");
+                            limit = pkmn_ave_count;
+                        }
+                        else if(i <= 14 && categoryChar == '1'){
+                            fp = fopen("pdif.txt", "r");
+                            limit = pkmn_dif_count;
+                        }
+                        else if(i <= 4 && categoryChar == '2'){
+                            fp = fopen("mez.txt", "r");
+                            limit = mov_ez_count;
+                        }
+                        else if(i <= 9 && categoryChar == '2'){
+                            fp = fopen("mave.txt", "r");
+                            limit = mov_ave_count;
+                        }
+                        else if(i <= 14 && categoryChar == '2'){
+                            fp = fopen("mdif.txt", "r");
+                            limit = mov_dif_count;
+                        }
+
                         do{
-                            // chooses what file to read according to category and difficulty
-                            if(i <= 4 && categoryChar == '1'){
-                                fp = fopen("pez.txt", "r");
-                                limit = pkmn_ez_count;
-                            }
-                            else if(i <= 9 && categoryChar == '1'){
-                                fp = fopen("pave.txt", "r");
-                                limit = pkmn_ave_count;
-                            }
-                            else if(i <= 14 && categoryChar == '1'){
-                                fp = fopen("pdif.txt", "r");
-                                limit = pkmn_dif_count;
-                            }
-                            else if(i <= 4 && categoryChar == '2'){
-                                fp = fopen("mez.txt", "r");
-                                limit = mov_ez_count;
-                            }
-                            else if(i <= 9 && categoryChar == '2'){
-                                fp = fopen("mave.txt", "r");
-                                limit = mov_ave_count;
-                            }
-                            else if(i <= 14 && categoryChar == '2'){
-                                fp = fopen("mdif.txt", "r");
-                                limit = mov_dif_count;
-                            }
-                            
                             // randomize number here
 
                             // displays the question panel with the corresponding category and difficulty
@@ -156,8 +159,15 @@ int main(){
                                 wrongAnswer3 = 'a';
                             }
 
-                            if(keypress == rightAnswer) totalScore = mayTamaKa(totalScore, increment); randomNumber++;
-                            else if(keypress == wrongAnswer1 || keypress == wrongAnswer2 || keypress == wrongAnswer3) betterLuckNextTime(); randomNumber++;
+                            // this evaluates if the answer is correct, wrong, or the user entered an invalid input
+                            if(keypress == rightAnswer){
+                                totalScore = mayTamaKa(totalScore, increment);
+                                randomNumber++;
+                            }
+                            else if(keypress == wrongAnswer1 || keypress == wrongAnswer2 || keypress == wrongAnswer3){
+                                betterLuckNextTime();
+                                randomNumber++;
+                            }
                             else if(keypress != 'a' && keypress != 'b' && keypress != 'c' && keypress != 'd' && keypress != 'q') wrongInput();
                             
                             // if the player presses quit, terminates the progress but saves the score
@@ -265,20 +275,20 @@ char questionPanel(FILE * fp, int count, char difficulty[], int color, int score
         for(i = 0; i < limit; i++){
             if((i + 1) == questionCount){
                 // question lines
-                char line1[32];
-                char line2[32];
-                char line3[32];
-                char line4[32];
-                char line5[32];
-                char line6[32];
-                char line7[32];
-                char line8[32];
+                char line1[33];
+                char line2[33];
+                char line3[33];
+                char line4[33];
+                char line5[33];
+                char line6[33];
+                char line7[33];
+                char line8[33];
 
                 // answer
-                char answer1[14];
-                char answer2[14];
-                char answer3[14];
-                char answer4[14];
+                char answer1[13];
+                char answer2[13];
+                char answer3[13];
+                char answer4[13];
 
                 // reading the questions per line
                 fgets(line1,32,fp);
@@ -315,22 +325,22 @@ char questionPanel(FILE * fp, int count, char difficulty[], int color, int score
 
                 // reading the answers
                 write_text("a.",20,140,WHITE,0); 
-                fgets(answer1,14,fp);
+                fgets(answer1,13,fp);
                 answer1[12] = '\0';
                 write_text(answer1,50,140,WHITE,0); 
 
                 write_text("b.",20,150,WHITE,0); 
-                fgets(answer2,14,fp);
+                fgets(answer2,13,fp);
                 answer2[12] = '\0';
                 write_text(answer2,50,150,WHITE,0); 
 
                 write_text("c.",180,140,WHITE,0);   
-                fgets(answer3,14,fp);
+                fgets(answer3,13,fp);
                 answer3[12] = '\0';
                 write_text(answer3,210,140,WHITE,0);   
                 
                 write_text("d.",180,150,WHITE,0);   
-                fgets(answer4,14,fp);
+                fgets(answer4,13,fp);
                 answer4[12] = '\0';
                 write_text(answer4,210,150,WHITE,0);   
 
@@ -338,7 +348,6 @@ char questionPanel(FILE * fp, int count, char difficulty[], int color, int score
                 fgets(correctAnswer,2,fp);
                 correctAnswer[1] = '\0';
                 write_text(correctAnswer,210,160,RED,0);   
-
             }
             else{
                 char dummyQuestion[350];
@@ -381,7 +390,7 @@ void enterName(){
 
     write_text("Enter Name : ",20,50,WHITE,1);
     write_text("(at most eight characters only)",20,70,WHITE,0);
-    write_text("Press enter to start.",150,170,GRAY,0);
+    write_text("Press enter to start.",120,170,GRAY,0);
 
     int k = 0;
 
