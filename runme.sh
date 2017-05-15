@@ -5,7 +5,7 @@
 # cd contrib/lights 
 # make
 # make install
-# cd ../..
+cd ics-os
 
 # compile and add quizbee.c to .img
 cd contrib/quizbee 

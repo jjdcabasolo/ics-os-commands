@@ -1,14 +1,11 @@
 #include "../../sdk/dexsdk.h"
 #include "../../sdk/time.h"
-#include "quizbee.h"
 
 // PROTOTYPES
 char mainMenu();                // displays the main menu - returns the coice of the user
 char category();                // displays the window for picking the category
 void enterName();            // asks the user of its name - which is utilized in the highscore panel
 void highScore();            // displays the window for highscores on both categories
-void enterIGN();
-void drawRectangle();
 
 char questionPanel();         // the window for each of the question
 int mayTamaKa();                // prompts the user that he/she got the correct answer
@@ -38,6 +35,14 @@ void erase();               // basically covers an area with a black rectangle
 // number of questions per category
 #define question_limit 5
 #define quit 'q'
+
+// questionCount
+#define pkmn_ez_count 10
+#define pkmn_ave_count 10
+#define pkmn_dif_count 10
+#define mov_ez_count 10
+#define mov_ave_count 10
+#define mov_dif_count 10
 
 // scores
 #define EZ_SCORE 2
@@ -70,7 +75,9 @@ void erase();               // basically covers an area with a black rectangle
 
 int main(){ 
     char keypress = start;
-	int i, j;
+    char categoryChar = start;
+	int i, j, randomNumber = 0;
+    FILE * fp;
 
 	set_graphics(VGA_320X200X256);
 
@@ -80,10 +87,9 @@ int main(){
             do{
                 keypress = category();             
                 if(keypress == category1){
-                    enterIGN();
-                    int totalScore = 0, increment = 0, quitting = 0;
-
-                    write_text(name,120,40,WHITE,1);
+                    enterName();
+                    int totalScore = 0, increment = 0, quitting = 0, limit = 0;
+                    char rightAnswer, wrongAnswer1, wrongAnswer2, wrongAnswer3;
 
                     for(i = 0; i < (question_limit*3); i++){ // traverse the question list :: easy pa lang to shet
                         if( i == 0 ) increment = ezPanel();
@@ -91,20 +97,69 @@ int main(){
                         if( i == 10 ) increment = ggPanel();
 
                         do{
-                            if( i <= 4 ) keypress = questionPanel((i+1), "Easy", BLUE);
-                            else if( i <= 9 ) keypress = questionPanel((i+1), "Average", GREEN);
-                            else if( i <= 14 ) keypress = questionPanel((i+1), "Difficult", RED);
+                            // chooses what file to read according to category and difficulty
+                            if(i <= 4 && categoryChar == '1'){
+                                fp = fopen("pez.txt", "r");
+                                limit = pkmn_ez_count;
+                            }
+                            else if(i <= 9 && categoryChar == '1'){
+                                fp = fopen("pave.txt", "r");
+                                limit = pkmn_ave_count;
+                            }
+                            else if(i <= 14 && categoryChar == '1'){
+                                fp = fopen("pdif.txt", "r");
+                                limit = pkmn_dif_count;
+                            }
+                            else if(i <= 4 && categoryChar == '2'){
+                                fp = fopen("mez.txt", "r");
+                                limit = mov_ez_count;
+                            }
+                            else if(i <= 9 && categoryChar == '2'){
+                                fp = fopen("mave.txt", "r");
+                                limit = mov_ave_count;
+                            }
+                            else if(i <= 14 && categoryChar == '2'){
+                                fp = fopen("mdif.txt", "r");
+                                limit = mov_dif_count;
+                            }
+                            
+                            // randomize number here
 
-                            // TODO: make function na mageevaluate kung anu-ano yung tama at maling character
-                            char rightAnswer = 'a';
-                            char wrongAnswer1 = 'b';
-                            char wrongAnswer2 = 'c';
-                            char wrongAnswer3 = 'd';
+                            // displays the question panel with the corresponding category and difficulty
+                            if( i <= 4 ) rightAnswer = questionPanel(fp, (i+1), "Easy", BLUE, totalScore, randomNum, limit);
+                            else if( i <= 9 ) rightAnswer = questionPanel(fp, (i+1), "Average", GREEN, totalScore, randomNum, limit);
+                            else if( i <= 14 ) rightAnswer = questionPanel(fp, (i+1), "Difficult", RED, totalScore, randomNum, limit);
+
+                            char keypress=(char)getch();
+                            erase(1,1,400,220);
+
+                            // this determines what will be the wrongs answers after reading the correct answer on the file
+                            if(rightAnswer = 'a'){
+                                wrongAnswer1 = 'b';
+                                wrongAnswer2 = 'c';
+                                wrongAnswer3 = 'd';
+                            }
+                            else if(rightAnswer = 'b'){
+                                wrongAnswer1 = 'a';
+                                wrongAnswer2 = 'c';
+                                wrongAnswer3 = 'd';
+                            }
+                            else if(rightAnswer = 'c'){
+                                wrongAnswer1 = 'b';
+                                wrongAnswer2 = 'a';
+                                wrongAnswer3 = 'd';
+                            }
+                            else if(rightAnswer = 'd'){
+                                wrongAnswer1 = 'b';
+                                wrongAnswer2 = 'c';
+                                wrongAnswer3 = 'a';
+                            }
 
                             if(keypress == rightAnswer) totalScore = mayTamaKa(totalScore, increment);
                             else if(keypress == wrongAnswer1 || keypress == wrongAnswer2 || keypress == wrongAnswer3) betterLuckNextTime();
                             else if(keypress != 'a' && keypress != 'b' && keypress != 'c' && keypress != 'd' && keypress != 'q') wrongInput();
                             
+                            // if the player presses quit
                             if(keypress == quit){
                                 quitter();
                                 quitting = 1;
@@ -191,84 +246,116 @@ char category(){
     return keypress;
 }
 
-char questionPanel(int count, char difficulty[], int color){
+char questionPanel(FILE * fp, int count, char difficulty[], int color, int score, int questionCount, int limit){
+    int i = 0;
     erase(1,1,400,220);
 
     // tanong
 	write_text("Question #",20,20,WHITE,1);
 
-    char scoreToChar[2];
-    sprintf(scoreToChar, "%ld", count);
-    write_text(scoreToChar,120,20,WHITE,1);
+    char countToChar[2];
+    sprintf(countToChar, "%ld", count);
+    write_text(countToChar,120,20,WHITE,1);
 
-    write_text("|",150,20,WHITE,1);
+    write_text("|",145,20,WHITE,1);
     write_text(difficulty,155,20,color,1);
 
     // yung mismong tanong
-    // three liner questions lang :( - 30 characters
-    FILE * fp = fopen("pez.txt", "r");
     if(fp != NULL){
-        char line1[31];
-        char line2[31];
-        char line3[31];
-        char line4[31];
-        char line5[31];
-        char line6[31];
-        char line7[31];
-        char line8[31];
-        char answer1[11];
-        char answer2[11];
-        char answer3[11];
-        char answer4[11];
+        for(i = 0; i < limit; i++){
+            if((i + 1) == questionCount){
+                // question lines
+                char line1[32];
+                char line2[32];
+                char line3[32];
+                char line4[32];
+                char line5[32];
+                char line6[32];
+                char line7[32];
+                char line8[32];
 
-        fgets(line1,31,fp);
-        line1[31] = '\0';
-        write_text(line1,20,50,WHITE,-1);
-        fgets(line2,31,fp);
-        line2[31] = '\0';
-        write_text(line2,20,60,WHITE,-1);
-        fgets(line3,31,fp);
-        line3[31] = '\0';
-        write_text(line3,20,70,WHITE,-1);
-        fgets(line4,31,fp);
-        line4[31] = '\0';
-        write_text(line4,20,80,WHITE,-1);
-        fgets(line5,31,fp);
-        line5[31] = '\0';
-        write_text(line5,20,90,WHITE,-1);
-        fgets(line6,31,fp);
-        line6[31] = '\0';
-        write_text(line6,20,100,WHITE,-1);
-        fgets(line7,31,fp);
-        line7[31] = '\0';
-        write_text(line7,20,110,WHITE,-1);
-        fgets(line8,31,fp);
-        line8[31] = '\0';
-        write_text(line8,20,120,WHITE,-1);
+                // answer
+                char answer1[14];
+                char answer2[14];
+                char answer3[14];
+                char answer4[14];
 
-    	write_text("a.",20,140,WHITE,0); 
-        fgets(answer1,10,fp);
-        answer1[8] = '\0';
-        write_text(answer1,50,140,WHITE,0); 
+                // reading the questions per line
+                fgets(line1,32,fp);
+                line1[31] = '\0';
+                write_text(line1,20,50,WHITE,-1);
 
-    	write_text("b.",20,150,WHITE,0); 
-        fgets(answer2,10,fp);
-        answer2[8] = '\0';
-        write_text(answer2,50,150,WHITE,0); 
+                fgets(line2,32,fp);
+                line2[31] = '\0';
+                write_text(line2,20,60,WHITE,-1);
 
-    	write_text("c.",180,140,WHITE,0);   
-        fgets(answer3,10,fp);
-        answer3[8] = '\0';
-        write_text(answer3,210,140,WHITE,0);   
-    	
-        write_text("d.",180,150,WHITE,0);   
-        fgets(answer4,10,fp);
-        answer4[8] = '\0';
-        write_text(answer4,210,150,WHITE,0);   
+                fgets(line3,32,fp);
+                line3[31] = '\0';
+                write_text(line3,20,70,WHITE,-1);
 
-        char correctAnswer;
-        fgets(answer4,10,fp);
+                fgets(line4,32,fp);
+                line4[31] = '\0';
+                write_text(line4,20,80,WHITE,-1);
 
+                fgets(line5,32,fp);
+                line5[31] = '\0';
+                write_text(line5,20,90,WHITE,-1);
+
+                fgets(line6,32,fp);
+                line6[31] = '\0';
+                write_text(line6,20,100,WHITE,-1);
+
+                fgets(line7,32,fp);
+                line7[31] = '\0';
+                write_text(line7,20,110,WHITE,-1);
+
+                fgets(line8,32,fp);
+                line8[31] = '\0';
+                write_text(line8,20,120,WHITE,-1);
+
+                // reading the answers
+                write_text("a.",20,140,WHITE,0); 
+                fgets(answer1,14,fp);
+                answer1[12] = '\0';
+                write_text(answer1,50,140,WHITE,0); 
+
+                write_text("b.",20,150,WHITE,0); 
+                fgets(answer2,14,fp);
+                answer2[12] = '\0';
+                write_text(answer2,50,150,WHITE,0); 
+
+                write_text("c.",180,140,WHITE,0);   
+                fgets(answer3,14,fp);
+                answer3[12] = '\0';
+                write_text(answer3,210,140,WHITE,0);   
+                
+                write_text("d.",180,150,WHITE,0);   
+                fgets(answer4,14,fp);
+                answer4[12] = '\0';
+                write_text(answer4,210,150,WHITE,0);   
+
+                // reading the correct answer
+                char correctAnswer[2];
+                fgets(correctAnswer,2,fp);
+                answer4[1] = '\0';
+            }
+            else{
+                char dummyQuestion[350];
+                fgets dummyQuestion,350,fp);
+                char answerCatch[13];
+                fgets(answerCatch,13,fp);
+                fgets(answerCatch,13,fp);
+                fgets(answerCatch,13,fp);
+                fgets(answerCatch,13,fp);
+                fgets(answerCatch,13,fp);
+                fgets(answerCatch,13,fp);
+                fgets(answerCatch,13,fp);
+                fgets(answerCatch,13,fp);
+                char correctAnswerCatch[1];
+                fgets(correctAnswerCatch,1,fp);   
+            }
+        }
+        
         fclose(fp);
     }
     else{
@@ -276,87 +363,24 @@ char questionPanel(int count, char difficulty[], int color){
         write_text(line1,20,50,WHITE,-1);
     }
 
-
     // score
     write_text("Score:",20,170,WHITE,0);   
-    int score = 0;
-    write_text((char)score,80,170,WHITE,0);   
+    char scoreToChar[2];
+    sprintf(scoreToChar, "%ld", score);
+    write_text(scoreToChar,80,170,YELLOW,0);   
     
     // quitting station
     write_text("[q] Quit game",165,170,GRAY,0);   
 
-    char keypress=(char)getch();
-    erase(1,1,400,220); //erase menu
     return keypress;
 }
 
-// void highScore(){
-//     erase(1,1,400,220);
+void enterName(){
+    int j = 90, notFinished = 0;
 
-//     // mainMenu
-// 	write_text("High scores!",110,20,WHITE,1);
-
-//     // catogory 1
-// 	write_text("Pokemon",50,40,YELLOW,1);
-//     // top 5
-// 	write_text("1 - Player 1",20,60,WHITE,0); 
-// 	write_text("2 - Player 1",20,80,WHITE,0); 
-// 	write_text("3 - Player 1",20,100,WHITE,0);   
-// 	write_text("4 - Player 1",20,120,WHITE,0);   
-// 	write_text("5 - Player 1",20,140,WHITE,0);   
-
-//     // catogory 2
-// 	write_text("Movies",230,40,CYAN,1);
-//     // top 5
-//     write_text("1 - Player 1",180,60,WHITE,0); 
-//     write_text("2 - Player 1",180,80,WHITE,0); 
-//     write_text("3 - Player 1",180,100,WHITE,0);   
-//     write_text("4 - Player 1",180,120,WHITE,0);   
-//     write_text("5 - Player 1",180,140,WHITE,0);   
-
-//     write_text("Press any key to continue...",35,170,GRAY,0);
-//     char keypress=(char)getch();
-//     erase(1,1,400,220); //erase menu
-// }
-
-void enterName(){   
-    int i = 0;
-    erase(1,1,400,220); //erase menu
-
-    // greetings
-	write_text("Hello!",125,40,WHITE,1);
-
-    // question
-    write_text("What is your name?",72,80,GRAY,1);
-    write_text("(enter 5 characters)",65,100,WHITE,0);
-
-    // write_text("Name: ",50,120,WHITE,0);
-    // write_text("_",90,120,WHITE,0);
-    // write_text("_",100,120,WHITE,0);
-    // write_text("_",110,120,WHITE,0);
-    // write_text("_",120,120,WHITE,0);
-    // write_text("_",130,120,WHITE,0);
-    // write_text("Press key to enter name...",35,150,GRAY,0);
-    // char stop2 = (char)getch();  
-
-    // for(i = 1; i < question_limit; i++){
-    //   erase(1,1,400,220); //erase menu
-    // }
-
-    char stop = (char)getch();  
-}
-
-
-void enterIGN(){
-    int inputLen=0;
-    char ign[10];
-    int j=90;
-    int notFinished = 0;
-
-    drawRectangle(0,0,320,220, BLACK);
     write_text("Enter Name : ",20,50,WHITE,1);
     write_text("(at most eight characters only)",20,70,WHITE,0);
-    write_text("Press 1 to start.",150,170,GRAY,0);
+    write_text("Press enter to start.",150,170,GRAY,0);
 
     int k = 0;
 
@@ -364,33 +388,44 @@ void enterIGN(){
         char keypress=(char)getch();
         // name[k] = keypress;
 
-        if(keypress == 1) break;        
+        // if(keypress == 1) break;        
         if(keypress == 'a') write_text("A", j+=10 , 90, WHITE, 1);
-        if(keypress == 'b') write_text("B", j+=10 , 90, WHITE, 1);
-        if(keypress == 'c') write_text("C", j+=10 , 90, WHITE, 1);
-        if(keypress == 'd') write_text("D", j+=10 , 90, WHITE, 1);
-        if(keypress == 'e') write_text("E", j+=10 , 90, WHITE, 1);
-        if(keypress == 'f') write_text("F", j+=10 , 90, WHITE, 1);
-        if(keypress == 'g') write_text("G", j+=10 , 90, WHITE, 1);
-        if(keypress == 'h') write_text("H", j+=10 , 90, WHITE, 1);
-        if(keypress == 'i') write_text("I", j+=10 , 90, WHITE, 1);
-        if(keypress == 'j') write_text("J", j+=10 , 90, WHITE, 1);
-        if(keypress == 'k') write_text("K", j+=10 , 90, WHITE, 1);
-        if(keypress == 'l') write_text("L", j+=10 , 90, WHITE, 1);
-        if(keypress == 'm') write_text("M", j+=10 , 90, WHITE, 1);
-        if(keypress == 'n') write_text("N", j+=10 , 90, WHITE, 1);
-        if(keypress == 'o') write_text("O", j+=10 , 90, WHITE, 1);
-        if(keypress == 'p') write_text("P", j+=10 , 90, WHITE, 1);
-        if(keypress == 'q') write_text("Q", j+=10 , 90, WHITE, 1);
-        if(keypress == 'r') write_text("R", j+=10 , 90, WHITE, 1);
-        if(keypress == 's') write_text("S", j+=10 , 90, WHITE, 1);
-        if(keypress == 't') write_text("T", j+=10 , 90, WHITE, 1);
-        if(keypress == 'u') write_text("U", j+=10 , 90, WHITE, 1);
-        if(keypress == 'v') write_text("V", j+=10 , 90, WHITE, 1);
-        if(keypress == 'w') write_text("W", j+=10 , 90, WHITE, 1);
-        if(keypress == 'x') write_text("X", j+=10 , 90, WHITE, 1);
-        if(keypress == 'y') write_text("Y", j+=10 , 90, WHITE, 1);
-        if(keypress == 'z') write_text("Z", j+=10 , 90, WHITE, 1);
+        else if(keypress == 'b') write_text("B", j+=10 , 90, WHITE, 1);
+        else if(keypress == 'c') write_text("C", j+=10 , 90, WHITE, 1);
+        else if(keypress == 'd') write_text("D", j+=10 , 90, WHITE, 1);
+        else if(keypress == 'e') write_text("E", j+=10 , 90, WHITE, 1);
+        else if(keypress == 'f') write_text("F", j+=10 , 90, WHITE, 1);
+        else if(keypress == 'g') write_text("G", j+=10 , 90, WHITE, 1);
+        else if(keypress == 'h') write_text("H", j+=10 , 90, WHITE, 1);
+        else if(keypress == 'i') write_text("I", j+=10 , 90, WHITE, 1);
+        else if(keypress == 'j') write_text("J", j+=10 , 90, WHITE, 1);
+        else if(keypress == 'k') write_text("K", j+=10 , 90, WHITE, 1);
+        else if(keypress == 'l') write_text("L", j+=10 , 90, WHITE, 1);
+        else if(keypress == 'm') write_text("M", j+=10 , 90, WHITE, 1);
+        else if(keypress == 'n') write_text("N", j+=10 , 90, WHITE, 1);
+        else if(keypress == 'o') write_text("O", j+=10 , 90, WHITE, 1);
+        else if(keypress == 'p') write_text("P", j+=10 , 90, WHITE, 1);
+        else if(keypress == 'q') write_text("Q", j+=10 , 90, WHITE, 1);
+        else if(keypress == 'r') write_text("R", j+=10 , 90, WHITE, 1);
+        else if(keypress == 's') write_text("S", j+=10 , 90, WHITE, 1);
+        else if(keypress == 't') write_text("T", j+=10 , 90, WHITE, 1);
+        else if(keypress == 'u') write_text("U", j+=10 , 90, WHITE, 1);
+        else if(keypress == 'v') write_text("V", j+=10 , 90, WHITE, 1);
+        else if(keypress == 'w') write_text("W", j+=10 , 90, WHITE, 1);
+        else if(keypress == 'x') write_text("X", j+=10 , 90, WHITE, 1);
+        else if(keypress == 'y') write_text("Y", j+=10 , 90, WHITE, 1);
+        else if(keypress == 'z') write_text("Z", j+=10 , 90, WHITE, 1);
+
+        else if(keypress == '1') write_text("1", j+=10 , 90, WHITE, 1);
+        else if(keypress == '2') write_text("2", j+=10 , 90, WHITE, 1);
+        else if(keypress == '3') write_text("3", j+=10 , 90, WHITE, 1);
+        else if(keypress == '4') write_text("4", j+=10 , 90, WHITE, 1);
+        else if(keypress == '5') write_text("5", j+=10 , 90, WHITE, 1);
+        else if(keypress == '6') write_text("6", j+=10 , 90, WHITE, 1);
+        else if(keypress == '7') write_text("7", j+=10 , 90, WHITE, 1);
+        else if(keypress == '8') write_text("8", j+=10 , 90, WHITE, 1);
+        else if(keypress == '9') write_text("9", j+=10 , 90, WHITE, 1);
+        else if(keypress == '0') write_text("0", j+=10 , 90, WHITE, 1);
 
         notFinished++;
         k++;
@@ -600,9 +635,3 @@ void erase(int x, int y, int w, int h){
     }
 }
 
-void drawRectangle(int x, int y, int w, int h, int color){
-   int i,j;
-   for (i=y;i<=(y+h);i++)
-      for (j=x;j<=(x+w);j++)
-         write_pixel(j,i,color);
-}

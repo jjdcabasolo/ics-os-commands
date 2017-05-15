@@ -934,16 +934,14 @@ int console_execute(const char *str)
               }
     
             // start of our awesome project
-            else if(strcmp(u, "date") == 0){
-                // user_execp(u, u, NULL);
-                // exec(u, "date", NULL);
-                //  api_addsystemcall(0x5B,user_execp,0,0);
-                //  api_addsystemcall(0x5C,user_exec,0,0);
-                // printf("%d", user_exec(u, 0x5C, NULL));
-                // execlp(u, "asdf", NULL);
-                // system("date");
-                printf("date!.\n");   
-            }
+            else if(strcmp(u, "a") == 0){
+                changedirectory("apps");
+                console_execute("quizbee.exe");
+            } // para hindi na paulit-ulit yung cd apps then quizbee.exe == tamad
+            else if(strcmp(u, "quiz") == 0){
+                changedirectory("apps");
+                console_execute("quizbee.exe");
+            } // para hindi na paulit-ulit yung cd apps then quizbee.exe == tamad
             // end of our awesome project
 
               else
