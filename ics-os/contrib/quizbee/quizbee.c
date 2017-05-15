@@ -76,7 +76,7 @@ void erase();               // basically covers an area with a black rectangle
 int main(){ 
     char keypress = start;
     char categoryChar = start;
-	int i, j, randomNumber = 0;
+	int i, j, randomNumber = 1;
     FILE * fp;
 
 	set_graphics(VGA_320X200X256);
@@ -86,7 +86,7 @@ int main(){
         if(keypress == start){
             do{
                 keypress = category();             
-                if(keypress == category1){
+                if(keypress == category1 || keypress == category2){
                     enterName();
                     int totalScore = 0, increment = 0, quitting = 0, limit = 0;
                     char rightAnswer, wrongAnswer1, wrongAnswer2, wrongAnswer3;
@@ -126,10 +126,11 @@ int main(){
                             // randomize number here
 
                             // displays the question panel with the corresponding category and difficulty
-                            if( i <= 4 ) rightAnswer = questionPanel(fp, (i+1), "Easy", BLUE, totalScore, randomNum, limit);
-                            else if( i <= 9 ) rightAnswer = questionPanel(fp, (i+1), "Average", GREEN, totalScore, randomNum, limit);
-                            else if( i <= 14 ) rightAnswer = questionPanel(fp, (i+1), "Difficult", RED, totalScore, randomNum, limit);
+                            if( i <= 4 ) rightAnswer = questionPanel(fp, (i+1), "Easy", BLUE, totalScore, randomNumber, limit);
+                            else if( i <= 9 ) rightAnswer = questionPanel(fp, (i+1), "Average", GREEN, totalScore, randomNumber, limit);
+                            else if( i <= 14 ) rightAnswer = questionPanel(fp, (i+1), "Difficult", RED, totalScore, randomNumber, limit);
 
+                            // gets the input from user in the question panel
                             char keypress=(char)getch();
                             erase(1,1,400,220);
 
@@ -155,26 +156,23 @@ int main(){
                                 wrongAnswer3 = 'a';
                             }
 
-                            if(keypress == rightAnswer) totalScore = mayTamaKa(totalScore, increment);
-                            else if(keypress == wrongAnswer1 || keypress == wrongAnswer2 || keypress == wrongAnswer3) betterLuckNextTime();
+                            if(keypress == rightAnswer) totalScore = mayTamaKa(totalScore, increment); randomNumber++;
+                            else if(keypress == wrongAnswer1 || keypress == wrongAnswer2 || keypress == wrongAnswer3) betterLuckNextTime(); randomNumber++;
                             else if(keypress != 'a' && keypress != 'b' && keypress != 'c' && keypress != 'd' && keypress != 'q') wrongInput();
                             
-                            // if the player presses quit
+                            // if the player presses quit, terminates the progress but saves the score
                             if(keypress == quit){
                                 quitter();
                                 quitting = 1;
                                 break;
                             }
+
                         }while(keypress != 'a' && keypress != 'b' && keypress != 'c' && keypress != 'd' && keypress != 'q');
-                        
                         if(quitting == 1) break;
                     }
 
                     // TODO: Write to file - highscores
                     totalScorePanel(totalScore);
-                }
-                else if(keypress == category2){
-                    // TODO: [prereq:: if(keypress == category1)] copy category 1 here
                 }
             }while(keypress != return_main_menu);
         }
@@ -248,6 +246,8 @@ char category(){
 
 char questionPanel(FILE * fp, int count, char difficulty[], int color, int score, int questionCount, int limit){
     int i = 0;
+    char correctAnswer[2];
+
     erase(1,1,400,220);
 
     // tanong
@@ -335,13 +335,14 @@ char questionPanel(FILE * fp, int count, char difficulty[], int color, int score
                 write_text(answer4,210,150,WHITE,0);   
 
                 // reading the correct answer
-                char correctAnswer[2];
                 fgets(correctAnswer,2,fp);
-                answer4[1] = '\0';
+                correctAnswer[1] = '\0';
+                write_text(correctAnswer,210,160,RED,0);   
+
             }
             else{
                 char dummyQuestion[350];
-                fgets dummyQuestion,350,fp);
+                fgets(dummyQuestion,350,fp);
                 char answerCatch[13];
                 fgets(answerCatch,13,fp);
                 fgets(answerCatch,13,fp);
@@ -372,7 +373,7 @@ char questionPanel(FILE * fp, int count, char difficulty[], int color, int score
     // quitting station
     write_text("[q] Quit game",165,170,GRAY,0);   
 
-    return keypress;
+    return correctAnswer[0];
 }
 
 void enterName(){
@@ -438,7 +439,7 @@ void highScore(){
     int i,j;
 
     // mainMenu
-    drawRectangle(0,0,320,220, GRAY);
+    // drawRectangle(0,0,320,220, GRAY);
     strcpy(line[0], "HIGH SCORES");
 
     // category 1
@@ -544,7 +545,7 @@ int ezPanel(){
     sprintf(scoreToChar, "%ld", EZ_SCORE);
     write_text(scoreToChar,180,60,WHITE,0);
     write_text("pts for",200,60,WHITE,0);
-    write_text("correct answer!",90,70,WHITE,0);
+    write_text("a correct answer!",85,70,WHITE,0);
 
     write_text("Otherwise,",110,90,WHITE,0);
     write_text("no points will be earned.",50,100,WHITE,0);
@@ -566,7 +567,7 @@ int avePanel(){
     sprintf(scoreToChar, "%ld", AVE_SCORE);
     write_text(scoreToChar,180,60,WHITE,0);
     write_text("pts for",200,60,WHITE,0);
-    write_text("correct answer!",90,70,WHITE,0);
+    write_text("a correct answer!",85,70,WHITE,0);
 
     write_text("Otherwise,",110,90,WHITE,0);
     write_text("no points will be earned.",50,100,WHITE,0);
@@ -588,7 +589,7 @@ int ggPanel(){
     sprintf(scoreToChar, "%ld", DIFF_SCORE);
     write_text(scoreToChar,180,60,WHITE,0);
     write_text("pts for",200,60,WHITE,0);
-    write_text("correct answer!",90,70,WHITE,0);
+    write_text("a correct answer!",85,70,WHITE,0);
 
     write_text("Otherwise,",110,90,WHITE,0);
     write_text("no points will be earned.",50,100,WHITE,0);
