@@ -73,6 +73,8 @@ void erase();               // basically covers an area with a black rectangle
 #define GRAY 56
 #define WHITE 63
 
+char name[8];
+
 int main(){ 
     char keypress = start;
     char categoryChar;
@@ -96,38 +98,39 @@ int main(){
                     int totalScore = 0, increment = 0, quitting = 0, limit = 0;
                     char rightAnswer, wrongAnswer1, wrongAnswer2, wrongAnswer3;
 
-                    for(i = 0; i < (question_limit*3); i++){ // traverse the question list :: easy pa lang to shet
+                     // traverse the question list :: easy pa lang to shet
+                    for(i = 0; i < (question_limit*3); i++){
                         if(i == 0) increment = ezPanel();
                         else if(i == 5) increment = avePanel();
                         else if(i == 10) increment = ggPanel();
+                        
+                        // chooses what file to read according to category and difficulty
+                        if(i <= 4 && categoryChar == category1){
+                            fp = fopen("pez.txt", "r");
+                            limit = pkmn_ez_count;
+                        }
+                        else if(i <= 9 && categoryChar == category1){
+                            fp = fopen("pave.txt", "r");
+                            limit = pkmn_ave_count;
+                        }
+                        else if(i <= 14 && categoryChar == category1){
+                            fp = fopen("pdif.txt", "r");
+                            limit = pkmn_dif_count;
+                        }
+                        else if(i <= 4 && categoryChar == category2){
+                            fp = fopen("mez.txt", "r");
+                            limit = mov_ez_count;
+                        }
+                        else if(i <= 9 && categoryChar == category2){
+                            fp = fopen("mave.txt", "r");
+                            limit = mov_ave_count;
+                        }
+                        else if(i <= 14 && categoryChar == category2){
+                            fp = fopen("mdif.txt", "r");
+                            limit = mov_dif_count;
+                        }
 
                         do{
-                            // chooses what file to read according to category and difficulty
-                            if(i <= 4 && categoryChar == category1){
-                                fp = fopen("pez.txt", "r");
-                                limit = pkmn_ez_count;
-                            }
-                            else if(i <= 9 && categoryChar == category1){
-                                fp = fopen("pave.txt", "r");
-                                limit = pkmn_ave_count;
-                            }
-                            else if(i <= 14 && categoryChar == category1){
-                                fp = fopen("pdif.txt", "r");
-                                limit = pkmn_dif_count;
-                            }
-                            else if(i <= 4 && categoryChar == category2){
-                                fp = fopen("mez.txt", "r");
-                                limit = mov_ez_count;
-                            }
-                            else if(i <= 9 && categoryChar == category2){
-                                fp = fopen("mave.txt", "r");
-                                limit = mov_ave_count;
-                            }
-                            else if(i <= 14 && categoryChar == category2){
-                                fp = fopen("mdif.txt", "r");
-                                limit = mov_dif_count;
-                            }
-
                             // randomize number here
 
                             // displays the question panel with the corresponding category and difficulty
@@ -279,14 +282,14 @@ char questionPanel(FILE * fp, int count, char difficulty[], int color, int score
         for(i = 0; i < limit; i++){
             if((i + 1) == questionCount){
                 // question lines
-                char line1[33];
-                char line2[33];
-                char line3[33];
-                char line4[33];
-                char line5[33];
-                char line6[33];
-                char line7[33];
-                char line8[33];
+                char line1[32];
+                char line2[32];
+                char line3[32];
+                char line4[32];
+                char line5[32];
+                char line6[32];
+                char line7[32];
+                char line8[32];
 
                 // answer
                 char answer1[13];
@@ -331,31 +334,33 @@ char questionPanel(FILE * fp, int count, char difficulty[], int color, int score
                 write_text("a.",20,140,WHITE,0); 
                 fgets(answer1,13,fp);
                 answer1[12] = '\0';
-                write_text(answer1,50,140,WHITE,0); 
+                write_text(answer1,40,140,WHITE,0); 
 
                 write_text("b.",20,150,WHITE,0); 
                 fgets(answer2,13,fp);
                 answer2[12] = '\0';
-                write_text(answer2,50,150,WHITE,0); 
+                write_text(answer2,40,150,WHITE,0); 
 
-                write_text("c.",180,140,WHITE,0);   
+                write_text("c.",170,140,WHITE,0);   
                 fgets(answer3,13,fp);
                 answer3[12] = '\0';
-                write_text(answer3,210,140,WHITE,0);   
+                write_text(answer3,190,140,WHITE,0);   
                 
-                write_text("d.",180,150,WHITE,0);   
+                write_text("d.",170,150,WHITE,0);   
                 fgets(answer4,13,fp);
                 answer4[12] = '\0';
-                write_text(answer4,210,150,WHITE,0);   
+                write_text(answer4,190,150,WHITE,0);   
 
                 // reading the correct answer
                 fgets(correctAnswer,2,fp);
                 correctAnswer[1] = '\0';
                 write_text(correctAnswer,210,160,RED,0);   
+                write_text(name,210,170,YELLOW,0);   
 
                 break;
             }
             else{
+                // gets the question component - the question, 4 possible answers, and the correct answer
                 char dummyQuestion[264];
                 fgets(dummyQuestion,264,fp);
                 char answerCatch[13];
@@ -363,10 +368,7 @@ char questionPanel(FILE * fp, int count, char difficulty[], int color, int score
                 fgets(answerCatch,13,fp);
                 fgets(answerCatch,13,fp);
                 fgets(answerCatch,13,fp);
-                // fgets(answerCatch,13,fp);
                 fgets(answerCatch,13,fp);
-                // fgets(answerCatch,13,fp);
-                // fgets(answerCatch,13,fp);
                 char correctAnswerCatch[1];
                 fgets(correctAnswerCatch,1,fp);   
             }
@@ -401,8 +403,9 @@ void enterName(){
     int k = 0;
 
     while (notFinished != 8){
-        char keypress=(char)getch();
-        // name[k] = keypress;
+        char keypress = (char)getch();
+        name[k] = keypress;
+        k++;
 
         if(keypress == 10) break;        
         if(keypress == 'a') write_text("A", j+=10 , 90, WHITE, 1);
