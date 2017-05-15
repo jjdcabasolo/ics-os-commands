@@ -75,57 +75,59 @@ void erase();               // basically covers an area with a black rectangle
 
 int main(){ 
     char keypress = start;
-    char categoryChar = start;
+    char categoryChar;
+
 	int i, j, randomNumber = 1;
     FILE * fp;
 
 	set_graphics(VGA_320X200X256);
 
 	do{
-        keypress = mainMenu(); //print menu
+        keypress = mainMenu();
         
         if(keypress == start){
             do{
                 keypress = category();             
                 categoryChar = keypress;
-                
+
                 if(keypress == category1 || keypress == category2){
                     enterName();
+
                     int totalScore = 0, increment = 0, quitting = 0, limit = 0;
                     char rightAnswer, wrongAnswer1, wrongAnswer2, wrongAnswer3;
 
                     for(i = 0; i < (question_limit*3); i++){ // traverse the question list :: easy pa lang to shet
-                        if( i == 0 ) increment = ezPanel();
-                        if( i == 5 ) increment = avePanel();
-                        if( i == 10 ) increment = ggPanel();
-
-                        // chooses what file to read according to category and difficulty
-                        if(i <= 4 && categoryChar == '1'){
-                            fp = fopen("pez.txt", "r");
-                            limit = pkmn_ez_count;
-                        }
-                        else if(i <= 9 && categoryChar == '1'){
-                            fp = fopen("pave.txt", "r");
-                            limit = pkmn_ave_count;
-                        }
-                        else if(i <= 14 && categoryChar == '1'){
-                            fp = fopen("pdif.txt", "r");
-                            limit = pkmn_dif_count;
-                        }
-                        else if(i <= 4 && categoryChar == '2'){
-                            fp = fopen("mez.txt", "r");
-                            limit = mov_ez_count;
-                        }
-                        else if(i <= 9 && categoryChar == '2'){
-                            fp = fopen("mave.txt", "r");
-                            limit = mov_ave_count;
-                        }
-                        else if(i <= 14 && categoryChar == '2'){
-                            fp = fopen("mdif.txt", "r");
-                            limit = mov_dif_count;
-                        }
+                        if(i == 0) increment = ezPanel();
+                        else if(i == 5) increment = avePanel();
+                        else if(i == 10) increment = ggPanel();
 
                         do{
+                            // chooses what file to read according to category and difficulty
+                            if(i <= 4 && categoryChar == category1){
+                                fp = fopen("pez.txt", "r");
+                                limit = pkmn_ez_count;
+                            }
+                            else if(i <= 9 && categoryChar == category1){
+                                fp = fopen("pave.txt", "r");
+                                limit = pkmn_ave_count;
+                            }
+                            else if(i <= 14 && categoryChar == category1){
+                                fp = fopen("pdif.txt", "r");
+                                limit = pkmn_dif_count;
+                            }
+                            else if(i <= 4 && categoryChar == category2){
+                                fp = fopen("mez.txt", "r");
+                                limit = mov_ez_count;
+                            }
+                            else if(i <= 9 && categoryChar == category2){
+                                fp = fopen("mave.txt", "r");
+                                limit = mov_ave_count;
+                            }
+                            else if(i <= 14 && categoryChar == category2){
+                                fp = fopen("mdif.txt", "r");
+                                limit = mov_dif_count;
+                            }
+
                             // randomize number here
 
                             // displays the question panel with the corresponding category and difficulty
@@ -267,7 +269,7 @@ char questionPanel(FILE * fp, int count, char difficulty[], int color, int score
     sprintf(countToChar, "%ld", count);
     write_text(countToChar,120,20,WHITE,1);
 
-    write_text("|",145,20,WHITE,1);
+    write_text("|",140,20,WHITE,1);
     write_text(difficulty,155,20,color,1);
 
     // yung mismong tanong
