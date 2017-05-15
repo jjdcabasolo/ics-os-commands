@@ -1,49 +1,66 @@
 #include "../../sdk/dexsdk.h"
 #include "../../sdk/time.h"
+#include "quizbee.h"
 
-void set_coordinates(int x, int y); //initialize bulb coordinates
-void setup_level(); //self explanatory
-void flip_fxn(int x, int y); 
-void gray(int x, int y); //prints a gray bulb socket
-void light(int r, int c, int x, int y); //prints a bulb light
-void print_bulb(int r, int c, int x, int y); //print a bulb
-void print_board(int x, int y); //set up initial board
-void edit_board(); // update selected and previously selected bulb colors
-void erase(); //basically covers an area with a black rectangle
+// PROTOTYPES
+char mainMenu();                // displays the main menu - returns the coice of the user
+char category();                // displays the window for picking the category
+void enterName();            // asks the user of its name - which is utilized in the highscore panel
+void highScore();            // displays the window for highscores on both categories
+void enterIGN();
+void drawRectangle();
 
-//displays menus
-void header();
-void category();
-void questionPanel();
-void highScore();
+char questionPanel();         // the window for each of the question
+int mayTamaKa();                // prompts the user that he/she got the correct answer
+void betterLuckNextTime();    // prompts the user that he/she got the wrong answer
+void wrongInput();        // displays the highscores
+void quitter();     // displays the window if the user quits in the middle of the game
 
-/* constants */
-#define maxrow 5
-#define maxcol 5
-#define max_level 6
-#define pause_length 25
+int ezPanel();          // baka naman i-mali mo pa!?
+int avePanel();     // kebs lang. 
+int ggPanel();          // syempre hinirapan namin, ano?
+void totalScorePanel();   // tapusin mo man o hindi, ija-judge ka pa rin. 
+void byeUserManggagamit();    // parting is such sweet sorrow. :(
 
-#define on 1
-#define son 2
-#define off 3
-#define soff 4
-#define flip 'l'
-#define up_key 'w'
-#define down_key 's'
-#define left_key 'a'
-#define right_key 'd'
-#define quit 'x'
-#define reset 'r'
-#define yes 'y'
-#define no 'n'
+void erase();               // basically covers an area with a black rectangle
+
+// CONSTANTS
+// main menu
 #define start '1'
-#define quit_game '2'
+#define high_score '2'
+#define quit_game '3'
 
 // categories
-#define category1 '3'
-#define category2 '4'
-#define return_main_menu '5'
+#define category1 '4'
+#define category2 '5'
+#define return_main_menu '6'
 
+// number of questions per category
+#define question_limit 5
+#define quit 'q'
+
+// scores
+#define EZ_SCORE 2
+#define AVE_SCORE 3
+#define DIFF_SCORE 5
+
+// colors!!!
+#define BLACK 0
+#define BLUE 1
+#define GREEN 2
+#define CYAN 3
+#define RED 4
+#define MAGENTA 5
+#define BROWN 6
+#define LIGHTGRAY 7
+#define DARKGRAY 8
+#define LIGHTBLUE 9
+#define LIGHTGREEN 10
+#define LIGHTCYAN 11
+#define LIGHTRED 12
+#define LIGHTMAGENTA 13
+#define DARK_YELLOW 14
+#define BLINK 128
 #define YELLOW 54
 #define PALE_YELLOW 62
 #define ROYAL_BLUE 1
@@ -51,300 +68,530 @@ void highScore();
 #define GRAY 56
 #define WHITE 63
 
-#define X_coord 85
-#define Y_coord 35
-
-/* global variables */
-int row, col, oldrow=0, oldcol=0;
-int flips=0, remaining_bulb;
-int level, count=0, hour=0, min=0;
-char board[maxrow][maxcol];
-int bulbs_x[maxrow][maxcol];
-int bulbs_y[maxrow][maxcol];
-
-int main(){
+int main(){ 
     char keypress = start;
 	int i, j;
-	char str[15];
-	int champion = 0;
 
 	set_graphics(VGA_320X200X256);
-  	set_coordinates(X_coord, Y_coord); //initialize bulb coordinates
 
 	do{
-        erase(1,1,400,220);
-
-        header(); //print menu
-        // level = 1; //initialize level
-        // champion = 0; //falsify championhood
-        keypress=(char)getch();
-        erase(1,1,400,220); //erase menu
-
+        keypress = mainMenu(); //print menu
         if(keypress == start){
             do{
-                // print category
-                category();       
-                keypress=(char)getch();
-                erase(1,1,400,220); //erase menu
-
+                keypress = category();             
                 if(keypress == category1){
-                    // do{
-                    //     if(keypress == start){
-                    //         setup_level(); 
-                    //         row=0;
-                    //         col=0;
-                    //         flips=0;
+                    enterIGN();
+                    int totalScore = 0, increment = 0, quitting = 0;
 
-                    //         //update level display
-                    //         erase(25,125,40,30);
-                    //         write_text("0",25,125,WHITE,0);
+                    write_text(name,120,40,WHITE,1);
 
-                    //     }		
-                    //     else{
-                    //         print_board(X_coord, Y_coord);
-                    //     }
+                    for(i = 0; i < (question_limit*3); i++){ // traverse the question list :: easy pa lang to shet
+                        if( i == 0 ) increment = ezPanel();
+                        if( i == 5 ) increment = avePanel();
+                        if( i == 10 ) increment = ggPanel();
 
-                    //     // main game - pressing lights
-                    //     do{
-                    //         if (keypress=(char)getch()){
+                        do{
+                            if( i <= 4 ) keypress = questionPanel((i+1), "Easy", BLUE);
+                            else if( i <= 9 ) keypress = questionPanel((i+1), "Average", GREEN);
+                            else if( i <= 14 ) keypress = questionPanel((i+1), "Difficult", RED);
+
+                            // TODO: make function na mageevaluate kung anu-ano yung tama at maling character
+                            char rightAnswer = 'a';
+                            char wrongAnswer1 = 'b';
+                            char wrongAnswer2 = 'c';
+                            char wrongAnswer3 = 'd';
+
+                            if(keypress == rightAnswer) totalScore = mayTamaKa(totalScore, increment);
+                            else if(keypress == wrongAnswer1 || keypress == wrongAnswer2 || keypress == wrongAnswer3) betterLuckNextTime();
+                            else if(keypress != 'a' && keypress != 'b' && keypress != 'c' && keypress != 'd' && keypress != 'q') wrongInput();
                             
-                    //             // update selected bulb
-                    //             if(keypress==right_key){
-                    //                 oldrow = row;
-                    //                 oldcol = col;
-                    //                 col = (col + 1) % maxcol;
-                    //             }
-                                
-                    //             else if(keypress==left_key){
-                    //                 oldrow = row;
-                    //                 oldcol = col;
-                    //                 if(col <= 0)
-                    //                     col = maxcol - 1;
-                    //                 else
-                    //                     col--;
-                    //             }
-                                
-                    //             else if(keypress==up_key){
-                    //                 oldrow = row;
-                    //                 oldcol = col;keypress=(char)getch();
-                    //                 if(row <= 0)
-                    //                     row = maxrow - 1;
-                    //                 else
-                    //                     row--;
-                    //             }
-                                
-                    //             else if(keypress==down_key){
-                    //                 oldrow = row;
-                    //                 oldcol = col;
-                    //                 row = (row + 1) % maxrow;
-                    //             }
-                                
-                    //             else if(keypress == flip){				
-                    //                 flips++;
-                    //                 erase(25,125,30,30);
-                    //                 sprintf(str,"%d",flips);
-                    //                 write_text(str,25,125,WHITE,0);
-                                    
-                    //                 // flip bulbs
-                                
-                    //                 // selected bulb
-                    //                 if(board[row][col] == son){
-                    //                     board[row][col] = soff;
-                    //                     remaining_bulb--;
-                    //                     flip_fxn(row, col);
-                    //                 }
-                    //                 else{
-                    //                     board[row][col] = son;
-                    //                     remaining_bulb++;
-                    //                     flip_fxn(row, col);
-                    //                 }
-                                    
-                    //                 // top
-                    //                 if(row -1 >= 0){
-                    //                     if(board[row-1][col] == on){
-                    //                         board[row-1][col] = off;
-                    //                         remaining_bulb--;
-                    //                         flip_fxn(row-1, col);
-                    //                     }
-                    //                     else{
-                    //                         board[row-1][col] = on;
-                    //                         remaining_bulb++;
-                    //                         flip_fxn(row-1, col);
-                    //                     }
-                    //                 }
-                                    
-                    //                 // down
-                    //                 if(row + 1 < maxrow){
-                    //                     if(board[row+1][col] == on){
-                    //                         board[row+1][col] = off;
-                    //                         remaining_bulb--;
-                    //                         flip_fxn(row+1, col);
-                    //                     }
-                    //                     else{
-                    //                         board[row+1][col] = on;
-                    //                         remaining_bulb++;
-                    //                         flip_fxn(row+1, col);
-                    //                     }
-                    //                 }
-                                    
-                    //                 // left
-                    //                 if(col -1 >= 0){
-                    //                     if(board[row][col-1] == on){
-                    //                         board[row][col-1] = off;
-                    //                         remaining_bulb--;
-                    //                         flip_fxn(row, col-1);
-                    //                     }
-                    //                     else{
-                    //                         board[row][col-1] = on;
-                    //                         remaining_bulb++;
-                    //                         flip_fxn(row, col-1);
-                    //                     }
-                    //                 }
-                                    
-                    //                 // right
-                    //                 if(col + 1 < maxcol){
-                    //                     if(board[row][col+1] == on){
-                    //                         board[row][col+1] = off;
-                    //                         remaining_bulb--;
-                    //                         flip_fxn(row, col+1);
-                    //                     }
-                    //                     else{
-                    //                         board[row][col+1] = on;
-                    //                         remaining_bulb++;
-                    //                         flip_fxn(row, col+1);
-                    //                     }
-                    //                 }
-                                    
-                    //             }
-                                
-                    //             if(remaining_bulb <= 0){
+                            if(keypress == quit){
+                                quitter();
+                                quitting = 1;
+                                break;
+                            }
+                        }while(keypress != 'a' && keypress != 'b' && keypress != 'c' && keypress != 'd' && keypress != 'q');
+                        
+                        if(quitting == 1) break;
+                    }
 
-                    //                 level++; //update level
-                    //                 if(level==max_level){ //finished all puzzles
-
-                    //                     write_text("Congratulations!",89,160,YELLOW,0);
-                    //                     write_text("You finished all levels.",65,170,YELLOW,0);
-                    //                     write_text("(Press any key)",101, 180,YELLOW,0);
-                    //                     keypress=(char)getch();
-                    //                     erase(1,1,350,280); //clear screen
-                    //                     champion=1; //player is now champion
-
-                    //                 }else{ //finished a puzzle
-                    //                     write_text("Congratulations!",89,160,WHITE,0);
-                    //                     write_text("Press any key",101, 170,WHITE,0);
-                    //                     keypress=(char)getch();
-                    //                     erase(80,160,150,40); //erase congratulations
-                    //                     keypress = start;
-                    //                 }
-                    //                 break;
-                    //             }
-                                
-                    //             // update the display of the selected and previously selected
-                    //             if(keypress==right_key || keypress==left_key || keypress==up_key || keypress==down_key){
-                    //                 board[row][col] = board[row][col] == on? son: soff;
-                    //                 board[oldrow][oldcol] = board[oldrow][oldcol] == son? on: off;					
-                    //                 edit_board();
-                    //             }
-                    //         }			
-                                
-                    //     } while (keypress != quit && keypress != reset && champion!=1);
-                    //         //continue while player is not quitting, restarting or champion
-
-                    //     if(champion==1){
-                    //         keypress = yes;
-                    //     }
-                    //     else if(keypress == quit){
-                    //         //prompt confirmation then erase message
-                    //         write_text("Do you want to exit? y/n ",60,160,WHITE,0); 
-                    //         keypress=(char)getch();
-                    //         erase(60,160,220,40);			
-                    //     }
-                    //     else if(keypress == reset){
-                    //         //prompt confirmation then erase message
-                    //         write_text("Do you want to restart? y/n ",50,160,WHITE,0);
-                    //         keypress=(char)getch();
-                    //         if(keypress == yes) keypress = start;
-                    //         erase(50,160,260,40);			
-                    //     }
-                    // } while (keypress != yes);
+                    // TODO: Write to file - highscores
+                    totalScorePanel(totalScore);
                 }
                 else if(keypress == category2){
+                    // TODO: [prereq:: if(keypress == category1)] copy category 1 here
                 }
-
             }while(keypress != return_main_menu);
         }
-        else if(keypress == highScore){
-            // print highscore
-            highScore();       
-            keypress=(char)getch();
-            erase(1,1,400,220); //erase menu            
-        }
-
+        else if(keypress == high_score) highScore();
+        else if(keypress == quit_game) byeUserManggagamit();
 	} while (keypress != quit_game);
 
 	set_graphics(VGA_TEXT80X25X16);
 	clrscr();
 }
 
-// ---- MENUS ----
-// displays header
-void header(){
+// FUNCTIONS
+char mainMenu(){
+    erase(1,1,400,220);
+
+    // borders
+    int i = 0, j = 0;
+    for (i=10;i<285;i++)write_pixel(i+10,20,PALE_YELLOW); // top
+    for (i=10;i<285;i++)write_pixel(i+10,21,PALE_YELLOW); // top
+
+    for (j=0;j<80;j++)write_pixel(10+10,j+20,PALE_YELLOW); // left
+    for (j=0;j<80;j++)write_pixel(10+11,j+20,PALE_YELLOW); // left
+
+    for (j=0;j<80;j++)write_pixel(285+10,j+20,PALE_YELLOW); // right
+    for (j=0;j<80;j++)write_pixel(285+11,j+20,PALE_YELLOW); // right
+
+    for (i=10;i<287;i++)write_pixel(i+10,100,PALE_YELLOW); // bottom
+    for (i=10;i<287;i++)write_pixel(i+10,101,PALE_YELLOW); // bottom
+
     // title
 	write_text("Quiz Bee!",120,40,WHITE,1);
-    // void write_text(char *str, int x, int y, int color,int size){}
 
-	//menu options
-	write_text("1 - Start",40,160,WHITE,0); 
-	write_text("2 - Quit",200,160,WHITE,0);
+	//menu options :: borders
+    // for (i=30;i<120;i++)write_pixel(i,150,ROYAL_BLUE); // top
+    // for (i=30;i<120;i++)write_pixel(i,151,ROYAL_BLUE); // top
+    // for (j=150;j<20;j++)write_pixel(20,j,ROYAL_BLUE); // left
+    // for (j=150;j<20;j++)write_pixel(21,j,ROYAL_BLUE); // right
+    // for (j=130;j<20;j++)write_pixel(120+10,j+20,ROYAL_BLUE); // left
+    // for (j=130;j<20;j++)write_pixel(120+11,j+20,ROYAL_BLUE); // right
+    // for (i=120;i<285;i++)write_pixel(i+10,20,PALE_YELLOW); // bottom
+    write_text("[1] Start",120,120,WHITE,0); 
+
+    // for (i=190;i<120;i++)write_pixel(i,150,ROYAL_BLUE); // top
+    // for (i=190;i<120;i++)write_pixel(i,151,ROYAL_BLUE); // top
+    // for (j=150;j<20;j++)write_pixel(20,j,ROYAL_BLUE); // left
+    // for (j=150;j<20;j++)write_pixel(21,j,ROYAL_BLUE); // right
+	write_text("[2] High Score",100,140,WHITE,0);
+
+    write_text("[3] Quit",125,160,WHITE,0);
+
+    char keypress=(char)getch();
+    erase(1,1,400,220); //erase menu
+    return keypress;
 }
 
+char category(){
+    erase(1,1,400,220);
 
-// displays categories
-void category(){
     // prompt
-	write_text("Choose a category",120,40,WHITE,1);
+	write_text("Choose a category",90,40,WHITE,1);
 
     // pick categories
-	write_text("4 - Category 1",120,100,WHITE,0); 
-	write_text("3 - Category 2",120,120,WHITE,0); 
-	write_text("5 - Return to main menu",120,140,WHITE,0);
+	write_text("[4] Pokemon",50,100,YELLOW,0); 
+	write_text("[5] Movies",50,120,CYAN,0); 
+	write_text("[6] Return to main menu",50,140,WHITE,0);
+
+    char keypress=(char)getch();
+    erase(1,1,400,220); //erase menu
+    return keypress;
 }
 
-void questionPanel(){
+char questionPanel(int count, char difficulty[], int color){
+    erase(1,1,400,220);
+
     // tanong
-	write_text("Question #1",120,40,WHITE,1);
+	write_text("Question #",20,20,WHITE,1);
 
-    // sagot
-	write_text("4 - Category 1",120,100,WHITE,0); 
-	write_text("3 - Category 2",120,120,WHITE,0); 
-	write_text("5 - Return to main menu",120,140,WHITE,0);   
-	write_text("5 - Return to main menu",120,140,WHITE,0);   
+    char scoreToChar[2];
+    sprintf(scoreToChar, "%ld", count);
+    write_text(scoreToChar,120,20,WHITE,1);
+
+    write_text("|",150,20,WHITE,1);
+    write_text(difficulty,155,20,color,1);
+
+    // yung mismong tanong
+    // three liner questions lang :( - 30 characters
+    FILE * fp = fopen("pez.txt", "r");
+    if(fp != NULL){
+        char line1[31];
+        char line2[31];
+        char line3[31];
+        char line4[31];
+        char line5[31];
+        char line6[31];
+        char line7[31];
+        char line8[31];
+        char answer1[11];
+        char answer2[11];
+        char answer3[11];
+        char answer4[11];
+
+        fgets(line1,31,fp);
+        line1[31] = '\0';
+        write_text(line1,20,50,WHITE,-1);
+        fgets(line2,31,fp);
+        line2[31] = '\0';
+        write_text(line2,20,60,WHITE,-1);
+        fgets(line3,31,fp);
+        line3[31] = '\0';
+        write_text(line3,20,70,WHITE,-1);
+        fgets(line4,31,fp);
+        line4[31] = '\0';
+        write_text(line4,20,80,WHITE,-1);
+        fgets(line5,31,fp);
+        line5[31] = '\0';
+        write_text(line5,20,90,WHITE,-1);
+        fgets(line6,31,fp);
+        line6[31] = '\0';
+        write_text(line6,20,100,WHITE,-1);
+        fgets(line7,31,fp);
+        line7[31] = '\0';
+        write_text(line7,20,110,WHITE,-1);
+        fgets(line8,31,fp);
+        line8[31] = '\0';
+        write_text(line8,20,120,WHITE,-1);
+
+    	write_text("a.",20,140,WHITE,0); 
+        fgets(answer1,10,fp);
+        answer1[8] = '\0';
+        write_text(answer1,50,140,WHITE,0); 
+
+    	write_text("b.",20,150,WHITE,0); 
+        fgets(answer2,10,fp);
+        answer2[8] = '\0';
+        write_text(answer2,50,150,WHITE,0); 
+
+    	write_text("c.",180,140,WHITE,0);   
+        fgets(answer3,10,fp);
+        answer3[8] = '\0';
+        write_text(answer3,210,140,WHITE,0);   
+    	
+        write_text("d.",180,150,WHITE,0);   
+        fgets(answer4,10,fp);
+        answer4[8] = '\0';
+        write_text(answer4,210,150,WHITE,0);   
+
+        char correctAnswer;
+        fgets(answer4,10,fp);
+
+        fclose(fp);
+    }
+    else{
+        char line1[30] = "file reading error. file read-";
+        write_text(line1,20,50,WHITE,-1);
+    }
+
+
+    // score
+    write_text("Score:",20,170,WHITE,0);   
+    int score = 0;
+    write_text((char)score,80,170,WHITE,0);   
+    
+    // quitting station
+    write_text("[q] Quit game",165,170,GRAY,0);   
+
+    char keypress=(char)getch();
+    erase(1,1,400,220); //erase menu
+    return keypress;
 }
 
-void highScore(){
-    // header
-	write_text("High scores!",120,40,WHITE,1);
+// void highScore(){
+//     erase(1,1,400,220);
 
-    // catogory 1
-	write_text("Category title 1",120,40,WHITE,1);
-    // top 5
-	write_text("1 - Category 1",120,100,WHITE,0); 
-	write_text("2 - Category 2",120,120,WHITE,0); 
-	write_text("3 - Return to main menu",120,140,WHITE,0);   
-	write_text("4 - Return to main menu",120,140,WHITE,0);   
-	write_text("5 - Return to main menu",120,140,WHITE,0);   
+//     // mainMenu
+// 	write_text("High scores!",110,20,WHITE,1);
 
-    // catogory 2
-	write_text("Category title 2",120,40,WHITE,1);
-    // top 5
-	write_text("1 - Category 1",120,100,WHITE,0); 
-	write_text("2 - Category 2",120,120,WHITE,0); 
-	write_text("3 - Return to main menu",120,140,WHITE,0);   
-	write_text("4 - Return to main menu",120,140,WHITE,0);   
-	write_text("5 - Return to main menu",120,140,WHITE,0);   
+//     // catogory 1
+// 	write_text("Pokemon",50,40,YELLOW,1);
+//     // top 5
+// 	write_text("1 - Player 1",20,60,WHITE,0); 
+// 	write_text("2 - Player 1",20,80,WHITE,0); 
+// 	write_text("3 - Player 1",20,100,WHITE,0);   
+// 	write_text("4 - Player 1",20,120,WHITE,0);   
+// 	write_text("5 - Player 1",20,140,WHITE,0);   
+
+//     // catogory 2
+// 	write_text("Movies",230,40,CYAN,1);
+//     // top 5
+//     write_text("1 - Player 1",180,60,WHITE,0); 
+//     write_text("2 - Player 1",180,80,WHITE,0); 
+//     write_text("3 - Player 1",180,100,WHITE,0);   
+//     write_text("4 - Player 1",180,120,WHITE,0);   
+//     write_text("5 - Player 1",180,140,WHITE,0);   
+
+//     write_text("Press any key to continue...",35,170,GRAY,0);
+//     char keypress=(char)getch();
+//     erase(1,1,400,220); //erase menu
+// }
+
+void enterName(){   
+    int i = 0;
+    erase(1,1,400,220); //erase menu
+
+    // greetings
+	write_text("Hello!",125,40,WHITE,1);
+
+    // question
+    write_text("What is your name?",72,80,GRAY,1);
+    write_text("(enter 5 characters)",65,100,WHITE,0);
+
+    // write_text("Name: ",50,120,WHITE,0);
+    // write_text("_",90,120,WHITE,0);
+    // write_text("_",100,120,WHITE,0);
+    // write_text("_",110,120,WHITE,0);
+    // write_text("_",120,120,WHITE,0);
+    // write_text("_",130,120,WHITE,0);
+    // write_text("Press key to enter name...",35,150,GRAY,0);
+    // char stop2 = (char)getch();  
+
+    // for(i = 1; i < question_limit; i++){
+    //   erase(1,1,400,220); //erase menu
+    // }
+
+    char stop = (char)getch();  
 }
 
-void erase(int x, int y, int w, int h){ //basically covers an area with a black rectangle 
+
+void enterIGN(){
+    int inputLen=0;
+    char ign[10];
+    int j=90;
+    int notFinished = 0;
+
+    drawRectangle(0,0,320,220, BLACK);
+    write_text("Enter Name : ",20,50,WHITE,1);
+    write_text("(at most eight characters only)",20,70,WHITE,0);
+    write_text("Press 1 to start.",150,170,GRAY,0);
+
+    int k = 0;
+
+    while (notFinished != 8){
+        char keypress=(char)getch();
+        // name[k] = keypress;
+
+        if(keypress == 1) break;        
+        if(keypress == 'a') write_text("A", j+=10 , 90, WHITE, 1);
+        if(keypress == 'b') write_text("B", j+=10 , 90, WHITE, 1);
+        if(keypress == 'c') write_text("C", j+=10 , 90, WHITE, 1);
+        if(keypress == 'd') write_text("D", j+=10 , 90, WHITE, 1);
+        if(keypress == 'e') write_text("E", j+=10 , 90, WHITE, 1);
+        if(keypress == 'f') write_text("F", j+=10 , 90, WHITE, 1);
+        if(keypress == 'g') write_text("G", j+=10 , 90, WHITE, 1);
+        if(keypress == 'h') write_text("H", j+=10 , 90, WHITE, 1);
+        if(keypress == 'i') write_text("I", j+=10 , 90, WHITE, 1);
+        if(keypress == 'j') write_text("J", j+=10 , 90, WHITE, 1);
+        if(keypress == 'k') write_text("K", j+=10 , 90, WHITE, 1);
+        if(keypress == 'l') write_text("L", j+=10 , 90, WHITE, 1);
+        if(keypress == 'm') write_text("M", j+=10 , 90, WHITE, 1);
+        if(keypress == 'n') write_text("N", j+=10 , 90, WHITE, 1);
+        if(keypress == 'o') write_text("O", j+=10 , 90, WHITE, 1);
+        if(keypress == 'p') write_text("P", j+=10 , 90, WHITE, 1);
+        if(keypress == 'q') write_text("Q", j+=10 , 90, WHITE, 1);
+        if(keypress == 'r') write_text("R", j+=10 , 90, WHITE, 1);
+        if(keypress == 's') write_text("S", j+=10 , 90, WHITE, 1);
+        if(keypress == 't') write_text("T", j+=10 , 90, WHITE, 1);
+        if(keypress == 'u') write_text("U", j+=10 , 90, WHITE, 1);
+        if(keypress == 'v') write_text("V", j+=10 , 90, WHITE, 1);
+        if(keypress == 'w') write_text("W", j+=10 , 90, WHITE, 1);
+        if(keypress == 'x') write_text("X", j+=10 , 90, WHITE, 1);
+        if(keypress == 'y') write_text("Y", j+=10 , 90, WHITE, 1);
+        if(keypress == 'z') write_text("Z", j+=10 , 90, WHITE, 1);
+
+        notFinished++;
+        k++;
+    }
+}
+
+void highScore(){   
+    char line[30][35];
+    int linebreak = 20, skip;
+    int i,j;
+
+    // mainMenu
+    drawRectangle(0,0,320,220, GRAY);
+    strcpy(line[0], "HIGH SCORES");
+
+    // category 1
+    strcpy(line[1], "Pokemon Category");
+    // top 5
+    strcpy(line[2], "Player 1");
+    strcpy(line[3], "Player 2");
+    strcpy(line[4], "Player 3");
+    strcpy(line[5], "Player 4");
+    strcpy(line[6], "Player 5");
+
+
+    // category 2
+    strcpy(line[7], "Movie Category");
+    // top 5
+    strcpy(line[8], "Player 1");
+    strcpy(line[9], "Player 2");
+    strcpy(line[10], "Player 3");
+    strcpy(line[11], "Player 4");
+    strcpy(line[12], "Player 5");
+    //return option
+    strcpy(line[13], "[Press any key to return]");
+    
+    write_text(line[0], 115, 20, PALE_YELLOW, 1);   //display high scores
+
+    write_text(line[1], 20, 45, BLACK, 0);       //display category title (Pokemon)
+    for(i=2; i<=6; i++){                         //display players
+        write_text(line[i], 25, 50+linebreak, WHITE, -1);
+        linebreak+=20;
+    }
+
+    linebreak = 20, skip;
+    write_text(line[7], 175, 45, BLACK, 0);     //display category title (Movie)
+    for(j=8; j<=12; j++){                       //display players
+        write_text(line[j], 180, 50+linebreak, WHITE, -1);
+        linebreak+=20;
+    }
+
+    write_text(line[13], 40, 180, CYAN, 0);     //display return option  
+    char stop = (char)getch();  
+}
+
+void wrongInput(){
+    erase(1,1,400,220); //erase menu
+
+    write_text("Ayusin ang input :(",80,80,GRAY,1);
+    write_text("a, b, c, d, or q",90,100,WHITE,0);
+    write_text("lang ang choices.",90,110,WHITE,0);
+    
+    write_text("Press any key to continue...",35,150,GRAY,0);
+    char stop = (char)getch();  
+}
+
+int mayTamaKa(int score, int increment){
+    erase(1,1,400,220); //erase menu
+
+    write_text("Correct!!!",120,80,YELLOW,1);
+    write_text("You have earned",40,100,WHITE,0);
+    
+    char scoreToChar[2];
+    sprintf(scoreToChar, "%ld", increment);
+    write_text(scoreToChar,190,100,WHITE,0);
+
+    write_text("points.",220,100,WHITE,0);
+    
+    write_text("Press any key to continue...",35,150,GRAY,0);
+    char stop = (char)getch();
+    return score + increment;
+}
+
+void betterLuckNextTime(){
+    erase(1,1,400,220); //erase menu
+
+    write_text("Wrong!!!",120,80,RED,1);
+    write_text("The correct answer is",70,100,WHITE,0);
+
+    char score[] = "a. Answer 1";
+    write_text(score,120,110,WHITE,0);
+
+    write_text("Press any key to continue...",35,150,GRAY,0);
+    char stop = (char)getch();
+}
+
+void quitter(){
+    erase(1,1,400,220); //erase menu
+
+    write_text("Quitter!",120,50,RED,1);
+    write_text("BOO!!!",130,70,WHITE,0);
+    write_text("You have ended your session.",35,100,WHITE,0);
+    write_text("Your score will be saved.",40,110,WHITE,0);
+
+    write_text("Press any key to continue...",35,150,GRAY,0);
+    char stop = (char)getch();
+}
+
+int ezPanel(){
+    erase(1,1,400,220);
+    
+    write_text("Easy round!!!",100,40,BLUE,1);
+
+    write_text("You will earn",50,60,WHITE,0);
+    char scoreToChar[2];
+    sprintf(scoreToChar, "%ld", EZ_SCORE);
+    write_text(scoreToChar,180,60,WHITE,0);
+    write_text("pts for",200,60,WHITE,0);
+    write_text("correct answer!",90,70,WHITE,0);
+
+    write_text("Otherwise,",110,90,WHITE,0);
+    write_text("no points will be earned.",50,100,WHITE,0);
+
+    write_text("READY?!",120,120,WHITE,0);
+    
+    write_text("Press any key to continue...",35,150,GRAY,0);
+    char stop = (char)getch();
+
+    return EZ_SCORE;
+}
+
+int avePanel(){
+    erase(1,1,400,220);
+    
+    write_text("Average round!!!",85,40,GREEN,1);
+    write_text("You will earn",50,60,WHITE,0);
+    char scoreToChar[2];
+    sprintf(scoreToChar, "%ld", AVE_SCORE);
+    write_text(scoreToChar,180,60,WHITE,0);
+    write_text("pts for",200,60,WHITE,0);
+    write_text("correct answer!",90,70,WHITE,0);
+
+    write_text("Otherwise,",110,90,WHITE,0);
+    write_text("no points will be earned.",50,100,WHITE,0);
+
+    write_text("READY?!",120,120,WHITE,0);
+    
+    write_text("Press any key to continue...",35,150,GRAY,0);
+    char stop = (char)getch();
+
+    return AVE_SCORE;
+}
+
+int ggPanel(){
+    erase(1,1,400,220);
+    
+    write_text("Difficult round!!!",85,40,RED,1);
+    write_text("You will earn",50,60,WHITE,0);
+    char scoreToChar[2];
+    sprintf(scoreToChar, "%ld", DIFF_SCORE);
+    write_text(scoreToChar,180,60,WHITE,0);
+    write_text("pts for",200,60,WHITE,0);
+    write_text("correct answer!",90,70,WHITE,0);
+
+    write_text("Otherwise,",110,90,WHITE,0);
+    write_text("no points will be earned.",50,100,WHITE,0);
+
+    write_text("READY?!",120,120,WHITE,0);
+    
+    write_text("Press any key to continue...",35,150,GRAY,0);
+    char stop = (char)getch();
+
+    return DIFF_SCORE;
+}
+
+void totalScorePanel(int score){
+    erase(1,1,400,220);
+    
+    write_text("Finished!",120,40,YELLOW,1);
+    write_text("You have earned a total of ",40,60,WHITE,0);
+    
+    char scoreToChar[2];
+    sprintf(scoreToChar, "%ld", score);
+
+    write_text(scoreToChar,140,90,YELLOW,1);
+    write_text("points!!!",120,100,WHITE,1);
+
+    write_text("Good job!",120,140,WHITE,0);
+
+    write_text("Press any key to continue...",35,150,GRAY,0);
+    char stop = (char)getch();
+}
+
+void byeUserManggagamit(){
+    erase(1,1,400,220);
+    write_text("BYE!",150,80,RED,1);
+    write_text("Press any key to exit...",55,150,GRAY,0);
+    char stop = (char)getch();
+}
+
+void erase(int x, int y, int w, int h){ 
     int i,j;
     for (i=y;i<=(y+h);i++){
         for (j=x;j<=(x+w);j++){
@@ -353,403 +600,9 @@ void erase(int x, int y, int w, int h){ //basically covers an area with a black 
     }
 }
 
-
-void flip_fxn(int x, int y){
-	light(x, y, bulbs_x[x][y], bulbs_y[x][y]); 
-}
-
-void set_coordinates(int x, int y){ //initialize bulb coordinates
-	int i, j, a, b;
-	
-	a = x;
-	b = y;
-	
-	for(i=0; i<maxrow; i++, b+=24){
-		for(j=0; j<maxcol; j++, a+=31){
-			bulbs_x[i][j] = a;
-			bulbs_y[i][j] = b;
-		}
-		a=x;
-	}
-}
-
-void setup_level(){
- 
-	int i, j;
-   
-	for(i=0; i<maxrow; i++)
-		for(j=0; j<maxcol; j++)
-			board[i][j]= off;
-
-	switch(level){
-	
-		case 1:			
-			board[0][0] = on;
-			board[0][1] = on;
-			board[0][3] = on;
-			board[0][4] = on;
-
-			board[1][0] = on;
-			board[1][2] = on;
-			board[1][4] = on;
-
-			board[2][1] = on;
-			board[2][2] = on;
-			board[2][3] = on;
-
-			board[3][0] = on;
-			board[3][2] = on;
-			board[3][4] = on;
-
-			board[4][0] = on;
-			board[4][1] = on;
-			board[4][3] = on;
-			board[4][4] = on;
-			break;
-
-		case 2:
-			
-			board[0][1] = on;
-			board[0][3] = on;
-			
-			board[1][0] = on;
-			board[1][1] = on;
-			board[1][3] = on;
-			board[1][4] = on;
-			
-			board[2][1] = on;
-			board[2][3] = on;
-			
-			board[3][0] = on;
-			board[3][2] = on;
-			board[3][4] = on;
-			
-			board[4][0] = on;
-			board[4][2] = on;
-			board[4][4] = on;
-			break;
-	
-		case 3:
-		
-			board[0][0] = on;
-			board[0][4] = on;
-			
-			board[1][0] = on;
-			board[1][1] = on;
-			board[1][3] = on;
-			board[1][4] = on;
-			
-			board[2][2] = on;
-			
-			board[3][0] = on;
-			board[3][2] = on;
-			
-			board[4][0] = on;
-			board[4][2] = on;
-			board[4][3] = on;
-			break;
-
-		case 4:
-		
-			board[0][0] = on;
-			board[0][1] = on;
-			board[0][3] = on;
-			board[0][4] = on;
-						
-			board[2][0] = on;
-			board[2][1] = on;
-			board[2][3] = on;
-			board[2][4] = on;
-			
-			board[3][4] = on;
-			
-			board[4][0] = on;
-			board[4][1] = on;
-			break;
-			
-		case 5:
-			
-			board[0][0] = on;
-			board[0][1] = on;
-			board[0][2] = on;
-			board[0][3] = on;
-			board[0][4] = on;
-			
-			board[1][0] = on;
-			board[1][1] = on;
-			board[1][2] = on;
-			board[1][3] = on;
-			board[1][4] = on;
-			
-			board[2][0] = on;
-			board[2][1] = on;
-			board[2][2] = on;
-			board[2][3] = on;
-			board[2][4] = on;
-			
-			board[3][0] = on;
-			board[3][1] = on;
-			board[3][2] = on;
-			board[3][3] = on;
-			board[3][4] = on;
-			
-			board[4][0] = on;
-			board[4][1] = on;
-			board[4][2] = on;
-			board[4][3] = on;
-			board[4][4] = on;
-			break;
-
-		case 6: board[0][3] = on;
-			board[0][4] = on;
-			board[1][3] = on;
-			board[1][4] = on;
-			board[3][0] = on;
-			board[3][1] = on;
-			board[4][0] = on;
-			board[4][1] = on;
-			break;
-
-		case 7: board[1][1] = on;
-			board[1][2] = on;
-			board[1][3] = on;
-			board[2][0] = on;
-			board[2][1] = on;
-			board[2][2] = on;
-			board[2][3] = on;
-			board[2][4] = on;
-			board[3][1] = on;
-			board[3][2] = on;
-			board[3][3] = on;
-			break;
-
-		case 8: board[1][1] = on;
-			board[1][2] = on;
-			board[1][3] = on;
-			board[2][1] = on;
-			board[2][2] = on;
-			board[2][3] = on;
-			board[3][1] = on;
-			board[3][2] = on;
-			board[3][3] = on;
-			break;
-
-		case 9: 
-
-			board[0][0] = on;
-			board[0][1] = on;
-			board[0][3] = on;
-			board[0][4] = on;
-			board[1][0] = on;
-			board[1][1] = on;
-			board[1][3] = on;
-			board[1][4] = on;
-			board[3][0] = on;
-			board[3][1] = on;
-			board[3][3] = on;
-			board[3][4] = on;
-			board[4][0] = on;
-			board[4][1] = on;
-			board[4][3] = on;
-			board[4][4] = on;
-			break;
-
-		case 10:
-			board[0][0] = on;
-			board[0][1] = on;
-			board[0][2] = on;
-			board[0][3] = on;
-			board[0][4] = on;
-			board[1][1] = on;
-			board[1][2] = on;
-			board[1][3] = on;
-			board[2][2] = on;
-			board[4][0] = on;
-			board[4][1] = on;
-			board[4][2] = on;
-			board[4][3] = on;
-			board[4][4] = on;
-			board[3][1] = on;
-			board[3][2] = on;
-			board[3][3] = on;
-			break;
-	}	
-	
-	// counts the number of bulbs that are turned on
-	remaining_bulb = 0;
-	for(i=0; i<maxrow; i++)
-		for(j=0; j<maxcol; j++)
-			if(board[i][j] == on)
-				remaining_bulb++;
-	
-	// starting point
-	board[0][0] = board[0][0] == on? son : soff;
-
-	erase(190,5,30,20); //erase menu
-	print_board(85, 35);
-}
-
-void gray(int x, int y){ //prints a gray bulb socket 
-    int i;
-	for (i=8;i<18;i++)write_pixel(i+x,0+y,56);
-	for (i=6;i<20;i++)write_pixel(i+x,1+y,56);
-	for (i=4;i<21;i++)write_pixel(i+x,2+y,56);
-	for (i=3;i<22;i++)write_pixel(i+x,3+y,56);
-	for (i=2;i<23;i++)write_pixel(i+x,4+y,56);
-	for (i=1;i<24;i++)write_pixel(i+x,5+y,56);
-	for (i=1;i<25;i++)write_pixel(i+x,6+y,56);
-	for (i=0;i<25;i++)write_pixel(i+x,7+y,56);
-	for (i=0;i<25;i++)write_pixel(i+x,8+y,56);
-	for (i=0;i<25;i++)write_pixel(i+x,9+y,56);
-	for (i=0;i<25;i++)write_pixel(i+x,10+y,56);
-	for (i=0;i<25;i++)write_pixel(i+x,11+y,56);
-	for (i=1;i<24;i++)write_pixel(i+x,12+y,56);
-	for (i=1;i<24;i++)write_pixel(i+x,13+y,56);
-	for (i=2;i<23;i++)write_pixel(i+x,14+y,56);
-	for (i=3;i<22;i++)write_pixel(i+x,15+y,56);
-	for (i=5;i<20;i++)write_pixel(i+x,16+y,56);
-	for (i=7;i<18;i++)write_pixel(i+x,17+y,56);
-	for (i=9;i<15;i++)write_pixel(i+x,18+y,56);
-
-}
-
-void light(int r, int c, int x, int y){ //prints a bulb light 
-	int i, color;
-	
-	switch(board[r][c]){ //sets the bulb's color
-		case on: color = YELLOW; break;
-		case son: color = WHITE; break;
-		case off: color = DARK_BLUE; break;
-		case soff: color = BLUE; break;
-	}
-	
-	for (i=9;i<17;i++)write_pixel(i+x,2+y,color);
-	for (i=7;i<19;i++)write_pixel(i+x,3+y,color);
-	for (i=5;i<20;i++)write_pixel(i+x,4+y,color);
-	for (i=4;i<21;i++)write_pixel(i+x,5+y,color);
-	for (i=4;i<21;i++)write_pixel(i+x,6+y,color);
-	for (i=3;i<22;i++)write_pixel(i+x,7+y,color);
-	for (i=3;i<22;i++)write_pixel(i+x,8+y,color);
-	for (i=4;i<21;i++)write_pixel(i+x,9+y,color);
-	for (i=4;i<21;i++)write_pixel(i+x,10+y,color);
-	for (i=5;i<20;i++)write_pixel(i+x,11+y,color);
-	for (i=7;i<18;i++)write_pixel(i+x,12+y,color);
-	for (i=9;i<17;i++)write_pixel(i+x,13+y,color);
-}
-
-void print_bulb(int r, int c, int x, int y){ //print a bulb 
-
-	gray(x, y);
-	light(r, c, x, y);
-	
-}
-
-void print_board(int x, int y){ //set up initial board 
-
-	int i, j, a, b;
- 	a=x;
- 	b=y;
- 	char str[15];
-
-	//display level
-   	write_text("Level",135,5,WHITE,0); 
-	sprintf(str,"%d",level);
-   	write_text(str,190,5,WHITE,0);
-
-	//print the 25 bulbs
-	for(i=0; i<maxrow; i++, b+=24){
-		for(j=0; j<maxcol; j++, a+=31)
-			print_bulb(i, j, a, b);
-		a=x;
-	}
-	
-	//display legend
-	write_text("Up-W",5,35,WHITE,0);
-	write_text("Dn-S",5,45,WHITE,0);
-	write_text("Lf-A",5,55,WHITE,0);
-	write_text("Rt-D",5,65,WHITE,0);
-	
-	write_text("Flip-L",5,75,WHITE,0);
-	write_text("Exit-X",5,85,WHITE,0);
-	write_text("Reset-R",5,95,WHITE,0);
-
-	//show number of flips
-	write_text("Flips:",5,115,WHITE,0);
-	
-}
-
-// update selected and previously selected bulb colors 
-void edit_board(){
-	light(oldrow, oldcol, bulbs_x[oldrow][oldcol], bulbs_y[oldrow][oldcol]);
-	light(row, col, bulbs_x[row][col], bulbs_y[row][col]);
-}
-
-void light2(int x, int y, int color){ //prints bulb light without checking,
-	int i;			      //explicit color defining	
-	
-	for (i=9;i<17;i++)write_pixel(i+x,2+y,color);
-	for (i=7;i<19;i++)write_pixel(i+x,3+y,color);
-	for (i=5;i<20;i++)write_pixel(i+x,4+y,color);
-	for (i=4;i<21;i++)write_pixel(i+x,5+y,color);
-	for (i=4;i<21;i++)write_pixel(i+x,6+y,color);
-	for (i=3;i<22;i++)write_pixel(i+x,7+y,color);
-	for (i=3;i<22;i++)write_pixel(i+x,8+y,color);
-	for (i=4;i<21;i++)write_pixel(i+x,9+y,color);
-	for (i=4;i<21;i++)write_pixel(i+x,10+y,color);
-	for (i=5;i<20;i++)write_pixel(i+x,11+y,color);
-	for (i=7;i<18;i++)write_pixel(i+x,12+y,color);
-	for (i=9;i<17;i++)write_pixel(i+x,13+y,color);
-}
-
-bulb_row2(int x, int y){ //displays header top and bottom borders
-	gray(0+x,0+y);
-	light2(0+x,0+y,BLUE);
-
-	gray(31+x,0+y);
-	light2(31+x,0+y,YELLOW);
-
-	gray(62+x,0+y);
-	light2(62+x,0+y,BLUE);
-
-	gray(93+x,0+y);
-	light2(93+x,0+y,YELLOW);
-
-	gray(124+x,0+y);
-	light2(124+x,0+y,BLUE);
-
-	gray(155+x,0+y);
-	light2(155+x,0+y,YELLOW);
-
-	gray(186+x,0+y);
-	light2(186+x,0+y,BLUE);
-
-	gray(217+x,0+y);
-	light2(217+x,0+y,YELLOW);
-
-	gray(248+x,0+y);
-	light2(248+x,0+y,BLUE);
-
-	gray(279+x,0+y);
-	light2(279+x,0+y,YELLOW);
-
-
-}
-
-//displays header left and right borders
-bulb_pair1(int x, int y){ 
-
-	gray(0+x,0+y);
-	light2(0+x,0+y,YELLOW);
-
-	gray(279+x,0+y);
-	light2(279+x,0+y,BLUE);
-}
-
-bulb_pair2(int x, int y){
-
-	gray(0+x,0+y);
-	light2(0+x,0+y,BLUE);
-
-	gray(279+x,0+y);
-	light2(279+x,0+y,YELLOW);
+void drawRectangle(int x, int y, int w, int h, int color){
+   int i,j;
+   for (i=y;i<=(y+h);i++)
+      for (j=x;j<=(x+w);j++)
+         write_pixel(j,i,color);
 }
