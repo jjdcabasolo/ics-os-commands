@@ -39,6 +39,10 @@ void erase();               // basically covers an area with a black rectangle
 // number of questions per category
 #define question_limit 5
 #define quit 'q'
+#define choice_1 'a'
+#define choice_2 'b'
+#define choice_3 'c'
+#define choice_4 'd'
 
 // questionCount
 #define pkmn_ez_count 10
@@ -153,13 +157,13 @@ int main(){
                         }
 
                         if(flag == 0){
+                            // randomize number here
                             generateRandomizedNumber(limit);
-                            displayRandomizedNumber(limit);
+                            // displayRandomizedNumber(limit);
                             flag = 1;
                         }
                         
                         do{
-                            // randomize number here
 
                             // displays the question panel with the corresponding category and difficulty
                             if( i <= 4 ) rightAnswer = questionPanel(fp, (i+1), "Easy", BLUE, totalScore, randomNumArray[randomNumberIndex], limit);
@@ -406,22 +410,38 @@ char questionPanel(FILE * fp, int count, char difficulty[], int color, int score
 
 // this determines what will be the wrongs answers after reading the correct answer on the file
 void evaluateCorrectAnswer(){
-    if(rightAnswer = 'a'){
+    if(rightAnswer == choice_1){
+        // char line1[30] = "the answer is AAAA";
+        // write_text(line1,20,50,YELLOW,0);
+        // // char keypress = (char)getch();
+
         wrongAnswer1 = 'b';
         wrongAnswer2 = 'c';
         wrongAnswer3 = 'd';
     }
-    else if(rightAnswer = 'b'){
+    else if(rightAnswer == choice_2){
+        // char line1[30] = "the answer is bb";
+        // write_text(line1,20,50,YELLOW,0);
+        // // char keypress = (char)getch();
+
         wrongAnswer1 = 'a';
         wrongAnswer2 = 'c';
         wrongAnswer3 = 'd';
     }
-    else if(rightAnswer = 'c'){
+    else if(rightAnswer == choice_3){
+        // char line1[30] = "the answer is ccccccccc";
+        // write_text(line1,20,50,YELLOW,0);
+        // // char keypress = (char)getch();
+
         wrongAnswer1 = 'b';
         wrongAnswer2 = 'a';
         wrongAnswer3 = 'd';
     }
-    else if(rightAnswer = 'd'){
+    else if(rightAnswer == choice_4){
+        // char line1[30] = "the answer is d";
+        // write_text(line1,20,50,YELLOW,0);
+        // // char keypress = (char)getch();
+
         wrongAnswer1 = 'b';
         wrongAnswer2 = 'c';
         wrongAnswer3 = 'a';
