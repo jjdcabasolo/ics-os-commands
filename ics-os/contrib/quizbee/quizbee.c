@@ -7,10 +7,12 @@ char category();                // displays the window for picking the category
 void enterName();            // asks the user of its name - which is utilized in the highscore panel
 void highScore();            // displays the window for highscores on both categories
 
-char questionPanel();         // the window for each of the question
 void evaluateCorrectAnswer();
-void generateRandomizedNumber();
-void displayRandomizedNumber();
+char questionPanel(int count, char difficulty[], int color, int score, int questionCount, int limit);         // the window for each of the question
+void generateRandomizedNumber(int limit);
+void displayRandomizedNumber(int limit);
+void chooseFileToRead(int i, char categoryChar);
+void setSettingsForDifficulty(int i);
 
 int mayTamaKa();                // prompts the user that he/she got the correct answer
 void betterLuckNextTime();    // prompts the user that he/she got the wrong answer
@@ -82,16 +84,17 @@ void erase();               // basically covers an area with a black rectangle
 #define WHITE 63
 
 // GLOBAL VARIABLES
-char name[8];
+char name[8], rightAnswerText[13], answer1[16], answer2[16], answer3[16], answer4[16];
 char rightAnswer, wrongAnswer1, wrongAnswer2, wrongAnswer3;
 int randomNumArray[10];
+int  limit = 0, increment = 0, randomNumberIndex = 1, flag = 0;;
+FILE * fp;
 
 int main(){ 
     char keypress = start;
     char categoryChar;
 
-	int i, j, randomNumberIndex = 1;
-    FILE * fp;
+	int i, j, totalScore = 0, quitting = 0;
 
 	set_graphics(VGA_320X200X256);
 
@@ -100,102 +103,47 @@ int main(){
         
         if(keypress == start){
             do{
-                // generateRandomizedNumber(5);
-
                 keypress = category();             
                 categoryChar = keypress;
 
-
                 if(keypress == category1 || keypress == category2){
-                    
                     enterName();
 
-                    int totalScore = 0, increment = 0, quitting = 0, limit = 0, flag = 0;
-
-                     // traverse the question list :: easy pa lang to shet
                     for(i = 0; i < (question_limit*3); i++){
-                        if(i == 0){
-                            increment = ezPanel();
-                            flag = 0;
-                            randomNumberIndex = 0;
-                        }
-                        else if(i == 5){
-                            increment = avePanel();
-                            flag = 0;
-                            randomNumberIndex = 0;
-                        }
-                        else if(i == 10){
-                            increment = ggPanel();
-                            flag = 0;
-                            randomNumberIndex = 0;
-                        }
-                        
-                        // chooses what file to read according to category and difficulty
-                        if(i <= 4 && categoryChar == category1){
-                            fp = fopen("pez.txt", "r");
-                            limit = pkmn_ez_count;
-                        }
-                        else if(i <= 9 && categoryChar == category1){
-                            fp = fopen("pave.txt", "r");
-                            limit = pkmn_ave_count;
-                        }
-                        else if(i <= 14 && categoryChar == category1){
-                            fp = fopen("pdif.txt", "r");
-                            limit = pkmn_dif_count;
-                        }
-                        else if(i <= 4 && categoryChar == category2){
-                            fp = fopen("mez.txt", "r");
-                            limit = mov_ez_count;
-                        }
-                        else if(i <= 9 && categoryChar == category2){
-                            fp = fopen("mave.txt", "r");
-                            limit = mov_ave_count;
-                        }
-                        else if(i <= 14 && categoryChar == category2){
-                            fp = fopen("mdif.txt", "r");
-                            limit = mov_dif_count;
-                        }
+                        // sets the settings for a certain difficulty (how many points earned if correct, resets 
+                        // index for array containing non-repeating random numbers, and sets the flag used in generating
+                        // the array containing non-repeating random numbers).
+                        setSettingsForDifficulty(i);
 
-                        if(flag == 0){
-                            // randomize number here
-                            generateRandomizedNumber(limit);
-                            // displayRandomizedNumber(limit);
-                            flag = 1;
-                        }
+                        // chooses what file to read according to category and difficulty, this also sets
+                        // the question count limit on each file to be used in file 
+                        chooseFileToRead(i, categoryChar);
+
+                        // generates and array containing non-repeating, randomized number
+                        // flag's use is to let the program generate the array of random numbers whenever
+                        // a new level of difficulty starts
+                        if(flag == 0) generateRandomizedNumber(limit); flag = 1;
                         
                         do{
-
-                            // displays the question panel with the corresponding category and difficulty
-                            if( i <= 4 ) rightAnswer = questionPanel(fp, (i+1), "Easy", BLUE, totalScore, randomNumArray[randomNumberIndex], limit);
-                            else if( i <= 9 ) rightAnswer = questionPanel(fp, (i+1), "Average", GREEN, totalScore, randomNumArray[randomNumberIndex], limit);
-                            else if( i <= 14 ) rightAnswer = questionPanel(fp, (i+1), "Difficult", RED, totalScore, randomNumArray[randomNumberIndex], limit);
+                            // displays the question panel with the corresponding category and difficulty, returns the correct answer
+                            if( i <= 4 ) rightAnswer = questionPanel((i+1), "Easy", BLUE, totalScore, randomNumArray[randomNumberIndex], limit);
+                            else if( i <= 9 ) rightAnswer = questionPanel((i+1), "Average", GREEN, totalScore, randomNumArray[randomNumberIndex], limit);
+                            else if( i <= 14 ) rightAnswer = questionPanel((i+1), "Difficult", RED, totalScore, randomNumArray[randomNumberIndex], limit);
 
                             // gets the input from user in the question panel
                             char keypress=(char)getch();
                             erase(1,1,400,220);
 
+                            // this determines what will be the wrongs answers after reading the correct answer on the file
                             evaluateCorrectAnswer();
 
                             // this evaluates if the answer is correct, wrong, or the user entered an invalid input
-                            if(keypress == rightAnswer){
-                                totalScore = mayTamaKa(totalScore, increment);
-                                randomNumberIndex++;
-                                break;
-                            }
-                            else if(keypress == wrongAnswer1 || keypress == wrongAnswer2 || keypress == wrongAnswer3){
-                                betterLuckNextTime();
-                                randomNumberIndex++;
-                                break;
-                            }
+                            if(keypress == rightAnswer){ totalScore = mayTamaKa(totalScore, increment); randomNumberIndex++; break; }
+                            else if(keypress == wrongAnswer1 || keypress == wrongAnswer2 || keypress == wrongAnswer3){ betterLuckNextTime(); randomNumberIndex++; break; }
                             else if(keypress != 'a' && keypress != 'b' && keypress != 'c' && keypress != 'd' && keypress != 'q') wrongInput();
                             
                             // if the player presses quit, terminates the progress but saves the score
-                            if(keypress == quit){
-                                quitter();
-                                quitting = 1;
-                                break;
-                            }
-
+                            if(keypress == quit) quitter(); quitting = 1; break;
                         }while(keypress != 'a' && keypress != 'b' && keypress != 'c' && keypress != 'd' && keypress != 'q');
                         if(quitting == 1) break;
                     }
@@ -273,7 +221,9 @@ char category(){
     return keypress;
 }
 
-char questionPanel(FILE * fp, int count, char difficulty[], int color, int score, int questionCount, int limit){
+// displays the question panel with the corresponding category and difficulty, returns the correct answer
+// @ param: int count = determines the question count
+char questionPanel(int count, char difficulty[], int color, int score, int questionCount, int limit){
     int i = 0, j = 0;
     char correctAnswer[2];
 
@@ -303,11 +253,6 @@ char questionPanel(FILE * fp, int count, char difficulty[], int color, int score
                 char line7[32];
                 char line8[36];
 
-                // answer
-                char answer1[16];
-                char answer2[16];
-                char answer3[16];
-                char answer4[16];
 
                 // reading the questions per line
                 fgets(line1,32,fp);
@@ -418,6 +363,10 @@ void evaluateCorrectAnswer(){
         wrongAnswer1 = 'b';
         wrongAnswer2 = 'c';
         wrongAnswer3 = 'd';
+
+        for(int i = 0; i < 13; i++){
+            rightAnswerText[i] = answer1[i];
+        }
     }
     else if(rightAnswer == choice_2){
         // char line1[30] = "the answer is bb";
@@ -427,6 +376,10 @@ void evaluateCorrectAnswer(){
         wrongAnswer1 = 'a';
         wrongAnswer2 = 'c';
         wrongAnswer3 = 'd';
+
+        for(int i = 0; i < 13; i++){
+            rightAnswerText[i] = answer2[i];
+        }
     }
     else if(rightAnswer == choice_3){
         // char line1[30] = "the answer is ccccccccc";
@@ -436,6 +389,10 @@ void evaluateCorrectAnswer(){
         wrongAnswer1 = 'b';
         wrongAnswer2 = 'a';
         wrongAnswer3 = 'd';
+
+        for(int i = 0; i < 13; i++){
+            rightAnswerText[i] = answer3[i];
+        }
     }
     else if(rightAnswer == choice_4){
         // char line1[30] = "the answer is d";
@@ -445,6 +402,31 @@ void evaluateCorrectAnswer(){
         wrongAnswer1 = 'b';
         wrongAnswer2 = 'c';
         wrongAnswer3 = 'a';
+
+        for(int i = 0; i < 13; i++){
+            rightAnswerText[i] = answer4[i];
+        }
+    }
+}
+
+// sets the settings for a certain difficulty (how many points earned if correct, resets 
+// index for array containing non-repeating random numbers, and sets the flag used in generating
+// the array containing non-repeating random numbers).
+void setSettingsForDifficulty(int i){
+    if(i == 0){
+        increment = ezPanel();
+        flag = 0;
+        randomNumberIndex = 0;
+    }
+    else if(i == 5){
+        increment = avePanel();
+        flag = 0;
+        randomNumberIndex = 0;
+    }
+    else if(i == 10){
+        increment = ggPanel();
+        flag = 0;
+        randomNumberIndex = 0;
     }
 }
 
@@ -463,7 +445,7 @@ void enterName(){
         k++;
 
         if(keypress == 10) break;        
-        if(keypress == 'a') write_text("A", j+=10 , 90, WHITE, 1);
+        else if(keypress == 'a') write_text("A", j+=10 , 90, WHITE, 1);
         else if(keypress == 'b') write_text("B", j+=10 , 90, WHITE, 1);
         else if(keypress == 'c') write_text("C", j+=10 , 90, WHITE, 1);
         else if(keypress == 'd') write_text("D", j+=10 , 90, WHITE, 1);
@@ -541,6 +523,35 @@ void displayRandomizedNumber(int limit){
         write_text(scoreToChar,20 + increment,170,YELLOW,0);   
         increment+=10;
         char keypress = (char)getch();
+    }
+}
+
+// chooses what file to read according to category and difficulty, this also sets
+// the question count limit on each file to be used in file reading 
+void chooseFileToRead(int i, char categoryChar){
+    if(i <= 4 && categoryChar == category1){
+        fp = fopen("pez.txt", "r");
+        limit = pkmn_ez_count;
+    }
+    else if(i <= 9 && categoryChar == category1){
+        fp = fopen("pave.txt", "r");
+        limit = pkmn_ave_count;
+    }
+    else if(i <= 14 && categoryChar == category1){
+        fp = fopen("pdif.txt", "r");
+        limit = pkmn_dif_count;
+    }
+    else if(i <= 4 && categoryChar == category2){
+        fp = fopen("mez.txt", "r");
+        limit = mov_ez_count;
+    }
+    else if(i <= 9 && categoryChar == category2){
+        fp = fopen("mave.txt", "r");
+        limit = mov_ave_count;
+    }
+    else if(i <= 14 && categoryChar == category2){
+        fp = fopen("mdif.txt", "r");
+        limit = mov_dif_count;
     }
 }
 
@@ -627,8 +638,7 @@ void betterLuckNextTime(){
     write_text("Wrong!!!",120,80,RED,1);
     write_text("The correct answer is",70,100,WHITE,0);
 
-    char score[] = "a. Answer 1";
-    write_text(score,120,110,WHITE,0);
+    write_text(rightAnswerText,120,110,WHITE,0);
 
     write_text("Press any key to continue...",35,150,GRAY,0);
     char stop = (char)getch();
