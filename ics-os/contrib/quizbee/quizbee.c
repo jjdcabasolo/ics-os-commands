@@ -84,7 +84,7 @@ void erase();               // basically covers an area with a black rectangle
 #define WHITE 63
 
 // GLOBAL VARIABLES
-char name[8], rightAnswerText[13], answer1[16], answer2[16], answer3[16], answer4[16];
+char name[8], rightAnswerText[16], answer1[16], answer2[16], answer3[16], answer4[16];
 char rightAnswer, wrongAnswer1, wrongAnswer2, wrongAnswer3;
 int randomNumArray[10];
 int  limit = 0, increment = 0, randomNumberIndex = 1, flag = 0;;
@@ -131,7 +131,7 @@ int main(){
                             else if( i <= 14 ) rightAnswer = questionPanel((i+1), "Difficult", RED, totalScore, randomNumArray[randomNumberIndex], limit);
 
                             // gets the input from user in the question panel
-                            char keypress=(char)getch();
+                            keypress = (char)getch();
                             erase(1,1,400,220);
 
                             // this determines what will be the wrongs answers after reading the correct answer on the file
@@ -140,10 +140,10 @@ int main(){
                             // this evaluates if the answer is correct, wrong, or the user entered an invalid input
                             if(keypress == rightAnswer){ totalScore = mayTamaKa(totalScore, increment); randomNumberIndex++; break; }
                             else if(keypress == wrongAnswer1 || keypress == wrongAnswer2 || keypress == wrongAnswer3){ betterLuckNextTime(); randomNumberIndex++; break; }
-                            else if(keypress != 'a' && keypress != 'b' && keypress != 'c' && keypress != 'd' && keypress != 'q') wrongInput();
+                            else if(keypress == quit){ quitter(); quitting = 1; break; }
+                            else  wrongInput();
                             
                             // if the player presses quit, terminates the progress but saves the score
-                            if(keypress == quit) quitter(); quitting = 1; break;
                         }while(keypress != 'a' && keypress != 'b' && keypress != 'c' && keypress != 'd' && keypress != 'q');
                         if(quitting == 1) break;
                     }
@@ -155,6 +155,10 @@ int main(){
         }
         else if(keypress == high_score) highScore();
         else if(keypress == quit_game) byeUserManggagamit();
+
+        // reset the integers used
+        totalScore = 0;
+        quitting = 0;
 	} while (keypress != quit_game);
 
 	set_graphics(VGA_TEXT80X25X16);
@@ -355,6 +359,7 @@ char questionPanel(int count, char difficulty[], int color, int score, int quest
 
 // this determines what will be the wrongs answers after reading the correct answer on the file
 void evaluateCorrectAnswer(){
+    int i = 0;
     if(rightAnswer == choice_1){
         // char line1[30] = "the answer is AAAA";
         // write_text(line1,20,50,YELLOW,0);
@@ -364,8 +369,11 @@ void evaluateCorrectAnswer(){
         wrongAnswer2 = 'c';
         wrongAnswer3 = 'd';
 
-        for(int i = 0; i < 13; i++){
-            rightAnswerText[i] = answer1[i];
+        rightAnswerText[0] = choice_1;
+        rightAnswerText[1] = '.';
+        rightAnswerText[2] = ' ';
+        for(i = 3; i < 16; i++){
+            rightAnswerText[i] = answer1[i-3];
         }
     }
     else if(rightAnswer == choice_2){
@@ -377,8 +385,11 @@ void evaluateCorrectAnswer(){
         wrongAnswer2 = 'c';
         wrongAnswer3 = 'd';
 
-        for(int i = 0; i < 13; i++){
-            rightAnswerText[i] = answer2[i];
+        rightAnswerText[0] = choice_2;
+        rightAnswerText[1] = '.';
+        rightAnswerText[2] = ' ';
+        for(i = 3; i < 16; i++){
+            rightAnswerText[i] = answer2[i-3];
         }
     }
     else if(rightAnswer == choice_3){
@@ -390,8 +401,11 @@ void evaluateCorrectAnswer(){
         wrongAnswer2 = 'a';
         wrongAnswer3 = 'd';
 
-        for(int i = 0; i < 13; i++){
-            rightAnswerText[i] = answer3[i];
+        rightAnswerText[0] = choice_3;
+        rightAnswerText[1] = '.';
+        rightAnswerText[2] = ' ';
+        for(i = 3; i < 16; i++){
+            rightAnswerText[i] = answer3[i-3];
         }
     }
     else if(rightAnswer == choice_4){
@@ -403,8 +417,11 @@ void evaluateCorrectAnswer(){
         wrongAnswer2 = 'c';
         wrongAnswer3 = 'a';
 
-        for(int i = 0; i < 13; i++){
-            rightAnswerText[i] = answer4[i];
+        rightAnswerText[0] = choice_4;
+        rightAnswerText[1] = '.';
+        rightAnswerText[2] = ' ';
+        for(i = 3; i < 16; i++){
+            rightAnswerText[i] = answer4[i-3];
         }
     }
 }
