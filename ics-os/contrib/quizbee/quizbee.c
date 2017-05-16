@@ -127,6 +127,9 @@ int main(){
                         if(flag == 0) generateRandomizedNumber(limit); flag = 1;
                         
                         do{
+                            // for some reasons, this is called once more due to some reasons which I really do not know why it happens
+                            chooseFileToRead(i, categoryChar);
+
                             // displays the question panel with the corresponding category and difficulty, returns the correct answer
                             if( i <= 4 ) rightAnswer = questionPanel((i+1), "Easy", BLUE, totalScore, randomNumArray[randomNumberIndex], limit);
                             else if( i <= 9 ) rightAnswer = questionPanel((i+1), "Average", GREEN, totalScore, randomNumArray[randomNumberIndex], limit);
@@ -147,7 +150,7 @@ int main(){
                             
                             // if the player presses quit, terminates the progress but saves the score
                         }while(keypress != 'a' && keypress != 'b' && keypress != 'c' && keypress != 'd' && keypress != 'q');
-                        if(quitting == 1) break;
+                        if(quitting == 1){ totalScore = 0; quitting = 0; break; } // resets highscore and the quitting flag
                     }
 
                     // TODO: Write to file - highscores
@@ -158,10 +161,6 @@ int main(){
         else if(keypress == high_score) highScore();
         else if(keypress == instruction_menu) instructionsPanel();
         else if(keypress == quit_game) byeUserManggagamit();
-
-        // reset the integers used
-        totalScore = 0;
-        quitting = 0;
 	} while (keypress != quit_game);
 
 	set_graphics(VGA_TEXT80X25X16);
@@ -231,7 +230,7 @@ char category(){
 // displays the question panel with the corresponding category and difficulty, returns the correct answer
 // @ param: int count = determines the question count
 char questionPanel(int count, char difficulty[], int color, int score, int questionCount, int limit){
-    int i = 0, j = 0;
+    int i = 0, j = 0, increment = 0;
 
     erase(1,1,400,220);
 
@@ -251,47 +250,55 @@ char questionPanel(int count, char difficulty[], int color, int score, int quest
             if((i + 1) == questionCount){
                 // question lines
                 char line1[32];
-                char line2[32];
-                char line3[32];
-                char line4[32];
-                char line5[32];
-                char line6[32];
-                char line7[32];
-                char line8[36];
+                // char line2[32];
+                // char line3[32];
+                // char line4[32];
+                // char line5[32];
+                // char line6[32];
+                // char line7[32];
+                // char line8[36];
 
+                for(j = 0; j < 8; j++){
+                    char line1[32];
+                    if(j!=7) fgets(line1,32,fp);
+                    else fgets(line1,36,fp);
+                    line1[31] = '\0';
+                    write_text(line1,20,50+increment,WHITE,-1);
+                    increment+=10;
+                }
 
                 // reading the questions per line
-                fgets(line1,32,fp);
-                line1[31] = '\0';
-                write_text(line1,20,50,WHITE,-1);
+                // fgets(line1,32,fp);
+                // line1[31] = '\0';
+                // write_text(line1,20,50,WHITE,-1);
 
-                fgets(line2,32,fp);
-                line2[31] = '\0';
-                write_text(line2,20,60,WHITE,-1);
+                // fgets(line2,32,fp);
+                // line2[31] = '\0';
+                // write_text(line2,20,60,WHITE,-1);
 
-                fgets(line3,32,fp);
-                line3[31] = '\0';
-                write_text(line3,20,70,WHITE,-1);
+                // fgets(line3,32,fp);
+                // line3[31] = '\0';
+                // write_text(line3,20,70,WHITE,-1);
 
-                fgets(line4,32,fp);
-                line4[31] = '\0';
-                write_text(line4,20,80,WHITE,-1);
+                // fgets(line4,32,fp);
+                // line4[31] = '\0';
+                // write_text(line4,20,80,WHITE,-1);
 
-                fgets(line5,32,fp);
-                line5[31] = '\0';
-                write_text(line5,20,90,WHITE,-1);
+                // fgets(line5,32,fp);
+                // line5[31] = '\0';
+                // write_text(line5,20,90,WHITE,-1);
 
-                fgets(line6,32,fp);
-                line6[31] = '\0';
-                write_text(line6,20,100,WHITE,-1);
+                // fgets(line6,32,fp);
+                // line6[31] = '\0';
+                // write_text(line6,20,100,WHITE,-1);
 
-                fgets(line7,32,fp);
-                line7[31] = '\0';
-                write_text(line7,20,110,WHITE,-1);
+                // fgets(line7,32,fp);
+                // line7[31] = '\0';
+                // write_text(line7,20,110,WHITE,-1);
 
-                fgets(line8,36,fp);
-                line8[31] = '\0';
-                write_text(line8,20,120,WHITE,-1);
+                // fgets(line8,36,fp);
+                // line8[31] = '\0';
+                // write_text(line8,20,120,WHITE,-1);
 
                 // reading the answers
                 // for(j = 0; j < 4; j++){
@@ -359,75 +366,31 @@ char questionPanel(int count, char difficulty[], int color, int score, int quest
     return correctAnswer[0];
 }
 
-// this determines what will be the wrongs answers after reading the correct answer on the file
+// this determines what will be the wrong answers after reading the correct answer on the file
 void evaluateCorrectAnswer(){
     int i = 0;
     if(rightAnswer == choice_1){
-        // char line1[30] = "the answer is AAAA";
-        // write_text(line1,20,50,YELLOW,0);
-        // // char keypress = (char)getch();
-
         wrongAnswer1 = 'b';
         wrongAnswer2 = 'c';
         wrongAnswer3 = 'd';
-
-        // rightAnswerText[0] = choice_1;
-        // rightAnswerText[1] = '.';
-        // rightAnswerText[2] = ' ';
-        // for(i = 3; i < 16; i++){
-        //     rightAnswerText[i] = answer1[i-3];
-        // }
         strcpy(rightAnswerText, answer1);
     }
     else if(rightAnswer == choice_2){
-        // char line1[30] = "the answer is bb";
-        // write_text(line1,20,50,YELLOW,0);
-        // // char keypress = (char)getch();
-
         wrongAnswer1 = 'a';
         wrongAnswer2 = 'c';
         wrongAnswer3 = 'd';
-
-        // rightAnswerText[0] = choice_2;
-        // rightAnswerText[1] = '.';
-        // rightAnswerText[2] = ' ';
-        // for(i = 3; i < 16; i++){
-        //     rightAnswerText[i] = answer2[i-3];
-        // }
         strcpy(rightAnswerText, answer2);
     }
     else if(rightAnswer == choice_3){
-        // char line1[30] = "the answer is ccccccccc";
-        // write_text(line1,20,50,YELLOW,0);
-        // // char keypress = (char)getch();
-
         wrongAnswer1 = 'b';
         wrongAnswer2 = 'a';
         wrongAnswer3 = 'd';
-
-        // rightAnswerText[0] = choice_3;
-        // rightAnswerText[1] = '.';
-        // rightAnswerText[2] = ' ';
-        // for(i = 3; i < 16; i++){
-        //     rightAnswerText[i] = answer3[i-3];
-        // }
         strcpy(rightAnswerText, answer3);
     }
     else if(rightAnswer == choice_4){
-        // char line1[30] = "the answer is d";
-        // write_text(line1,20,50,YELLOW,0);
-        // // char keypress = (char)getch();
-
         wrongAnswer1 = 'b';
         wrongAnswer2 = 'c';
         wrongAnswer3 = 'a';
-
-        // rightAnswerText[0] = choice_4;
-        // rightAnswerText[1] = '.';
-        // rightAnswerText[2] = ' ';
-        // for(i = 3; i < 16; i++){
-        //     rightAnswerText[i] = answer4[i-3];
-        // }
         strcpy(rightAnswerText, answer4);
     }
 }
@@ -465,48 +428,104 @@ void enterName(){
     while (notFinished != 8){
         char keypress = (char)getch();
         name[k] = keypress;
-        k++;
+        // k++;
+        // notFinished++;
 
-        if(keypress == 10) break;        
-        else if(keypress == 'a') write_text("A", j+=10 , 90, WHITE, 1);
-        else if(keypress == 'b') write_text("B", j+=10 , 90, WHITE, 1);
-        else if(keypress == 'c') write_text("C", j+=10 , 90, WHITE, 1);
-        else if(keypress == 'd') write_text("D", j+=10 , 90, WHITE, 1);
-        else if(keypress == 'e') write_text("E", j+=10 , 90, WHITE, 1);
-        else if(keypress == 'f') write_text("F", j+=10 , 90, WHITE, 1);
-        else if(keypress == 'g') write_text("G", j+=10 , 90, WHITE, 1);
-        else if(keypress == 'h') write_text("H", j+=10 , 90, WHITE, 1);
-        else if(keypress == 'i') write_text("I", j+=10 , 90, WHITE, 1);
-        else if(keypress == 'j') write_text("J", j+=10 , 90, WHITE, 1);
-        else if(keypress == 'k') write_text("K", j+=10 , 90, WHITE, 1);
-        else if(keypress == 'l') write_text("L", j+=10 , 90, WHITE, 1);
-        else if(keypress == 'm') write_text("M", j+=10 , 90, WHITE, 1);
-        else if(keypress == 'n') write_text("N", j+=10 , 90, WHITE, 1);
-        else if(keypress == 'o') write_text("O", j+=10 , 90, WHITE, 1);
-        else if(keypress == 'p') write_text("P", j+=10 , 90, WHITE, 1);
-        else if(keypress == 'q') write_text("Q", j+=10 , 90, WHITE, 1);
-        else if(keypress == 'r') write_text("R", j+=10 , 90, WHITE, 1);
-        else if(keypress == 's') write_text("S", j+=10 , 90, WHITE, 1);
-        else if(keypress == 't') write_text("T", j+=10 , 90, WHITE, 1);
-        else if(keypress == 'u') write_text("U", j+=10 , 90, WHITE, 1);
-        else if(keypress == 'v') write_text("V", j+=10 , 90, WHITE, 1);
-        else if(keypress == 'w') write_text("W", j+=10 , 90, WHITE, 1);
-        else if(keypress == 'x') write_text("X", j+=10 , 90, WHITE, 1);
-        else if(keypress == 'y') write_text("Y", j+=10 , 90, WHITE, 1);
-        else if(keypress == 'z') write_text("Z", j+=10 , 90, WHITE, 1);
-
-        else if(keypress == '1') write_text("1", j+=10 , 90, WHITE, 1);
-        else if(keypress == '2') write_text("2", j+=10 , 90, WHITE, 1);
-        else if(keypress == '3') write_text("3", j+=10 , 90, WHITE, 1);
-        else if(keypress == '4') write_text("4", j+=10 , 90, WHITE, 1);
-        else if(keypress == '5') write_text("5", j+=10 , 90, WHITE, 1);
-        else if(keypress == '6') write_text("6", j+=10 , 90, WHITE, 1);
-        else if(keypress == '7') write_text("7", j+=10 , 90, WHITE, 1);
-        else if(keypress == '8') write_text("8", j+=10 , 90, WHITE, 1);
-        else if(keypress == '9') write_text("9", j+=10 , 90, WHITE, 1);
-        else if(keypress == '0') write_text("0", j+=10 , 90, WHITE, 1);
-
-        notFinished++;
+        // the user entered enter
+        if(keypress == 10){ name[k] = '\0'; break; }
+        // small letters
+        else if(keypress == 'a'){ write_text("a", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == 'b'){ write_text("b", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == 'c'){ write_text("c", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == 'd'){ write_text("d", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == 'e'){ write_text("e", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == 'f'){ write_text("f", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == 'g'){ write_text("g", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == 'h'){ write_text("h", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == 'i'){ write_text("i", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == 'j'){ write_text("j", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == 'k'){ write_text("k", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == 'l'){ write_text("l", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == 'm'){ write_text("m", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == 'n'){ write_text("n", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == 'o'){ write_text("o", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == 'p'){ write_text("p", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == 'q'){ write_text("q", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == 'r'){ write_text("r", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == 's'){ write_text("s", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == 't'){ write_text("t", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == 'u'){ write_text("u", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == 'v'){ write_text("v", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == 'w'){ write_text("w", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == 'x'){ write_text("x", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == 'y'){ write_text("y", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == 'z'){ write_text("z", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        // big letters
+        else if(keypress == 'A'){ write_text("A", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == 'B'){ write_text("B", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == 'C'){ write_text("C", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == 'D'){ write_text("D", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == 'E'){ write_text("E", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == 'F'){ write_text("F", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == 'G'){ write_text("G", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == 'H'){ write_text("H", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == 'I'){ write_text("I", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == 'J'){ write_text("J", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == 'K'){ write_text("K", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == 'L'){ write_text("L", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == 'M'){ write_text("M", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == 'N'){ write_text("N", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == 'O'){ write_text("O", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == 'P'){ write_text("P", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == 'Q'){ write_text("Q", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == 'R'){ write_text("R", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == 'S'){ write_text("S", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == 'T'){ write_text("T", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == 'U'){ write_text("U", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == 'V'){ write_text("V", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == 'W'){ write_text("W", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == 'X'){ write_text("X", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == 'Y'){ write_text("Y", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == 'Z'){ write_text("Z", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        // numbers: panis may number sa pangalan
+        else if(keypress == '1'){ write_text("1", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == '2'){ write_text("2", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == '3'){ write_text("3", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == '4'){ write_text("4", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == '5'){ write_text("5", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == '6'){ write_text("6", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == '7'){ write_text("7", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == '8'){ write_text("8", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == '9'){ write_text("9", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == '0'){ write_text("0", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        // symbols: baka naman kailangan nila sa pangalan nila, ano?
+        else if(keypress == '.'){ write_text(".", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == '?'){ write_text("?", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == '!'){ write_text("!", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == '#'){ write_text("#", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == '@'){ write_text("@", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == '$'){ write_text("$", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == '^'){ write_text("^", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == '&'){ write_text("&", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == '*'){ write_text("*", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == '('){ write_text("(", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == ')'){ write_text(")", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == '['){ write_text("[", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == ']'){ write_text("]", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == '{'){ write_text("{", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == '}'){ write_text("}", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == ':'){ write_text(":", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == ';'){ write_text(";", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == ','){ write_text(",", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == '<'){ write_text("<", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == '>'){ write_text(">", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == '/'){ write_text("/", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == '-'){ write_text("-", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == '+'){ write_text("+", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == '\\'){ write_text("\\", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == '\''){ write_text("'", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == '"'){ write_text("\"", j+=10 , 90, WHITE, 1); k++; notFinished++; }
+        else if(keypress == '='){ write_text("=", j+=10 , 90, WHITE, 1); k++; notFinished++; }
     }
 
     name[k] = '\0';
