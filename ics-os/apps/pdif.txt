@@ -22,7 +22,7 @@ Naive
 Serious      
 Timid        
 d
-Gym Leaders are the highest-ranking member of a Pokemon Gym. Its main job is to test trainers to become strong enough to compete against the Elite Four. If defeated, the trainer earns a Gym Badge. To whom do you get the Earth Badge?                
+Gym Leaders are the highest-ranking member of a Pokemon Gym. Its main job is to test trainers to become strong enough to compete against the Pokemon League. If defeated, the trainer earns a Gym Badge. To whom do you get the Earth Badge?            
 Sabrina      
 Giovanni     
 Morty        
@@ -52,3 +52,9 @@ Core Enforcer
 Zen Headbutt 
 Metronome    
 d
+A Pokemon Champion is considered to be the highest known rank for a Pokemon Trainer. In order to be a Champion, a trainer must obtain all 8 Gym Badges and defeat the Elite Four. Who is the Champion of the Kalos League?                              
+Diantha      
+Wallace      
+Steven       
+Cynthia      
+a

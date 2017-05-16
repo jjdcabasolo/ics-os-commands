@@ -40,7 +40,7 @@ Lugia
 Manaphy      
 Phione       
 b
-The Pokemon world consists of several regions, where each has its own list of towns, cities, and landmarks. Which of these locations are not a name of a Pokemon world city?                                                                            
+The Pokemon world consists of several regions, where each has its own list of towns, cities, and landmarks. Which of these locations is not a name of a Pokemon world city?                                                                             
 Snowpoint    
 Vermillion   
 Pacifidlog   
@@ -58,9 +58,3 @@ Coronet
 Silver       
 Moon         
 b
-A Pokemon Champion is considered to be the highest known rank for a Pokemon Trainer. In order to be a Champion, a trainer must obtain all 8 Gym Badges and defeat the Elite Four. Who is the Champion of the Kalos League?                             
-Diantha      
-Wallace      
-Steven       
-Cynthia      
-a

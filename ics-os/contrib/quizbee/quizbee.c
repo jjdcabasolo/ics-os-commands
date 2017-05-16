@@ -173,20 +173,20 @@ char mainMenu(){
 
     // borders
     int i = 0, j = 0;
-    for (i=10;i<285;i++)write_pixel(i+10,20,PALE_YELLOW); // top
-    for (i=10;i<285;i++)write_pixel(i+10,21,PALE_YELLOW); // top
+    for(i=10;i<150;i++) write_pixel(i+10,20,PALE_YELLOW); // top
+    for(i=10;i<150;i++) write_pixel(i+10,21,PALE_YELLOW); // top
 
-    for (j=0;j<80;j++)write_pixel(10+10,j+20,PALE_YELLOW); // left
-    for (j=0;j<80;j++)write_pixel(10+11,j+20,PALE_YELLOW); // left
+    for(j=0;j<160;j++) write_pixel(10+10,j+20,PALE_YELLOW); // left
+    for(j=0;j<160;j++) write_pixel(10+11,j+20,PALE_YELLOW); // left
 
-    for (j=0;j<80;j++)write_pixel(285+10,j+20,PALE_YELLOW); // right
-    for (j=0;j<80;j++)write_pixel(285+11,j+20,PALE_YELLOW); // right
+    for(j=0;j<160;j++) write_pixel(150+10,j+20,PALE_YELLOW); // right
+    for(j=0;j<160;j++) write_pixel(150+11,j+20,PALE_YELLOW); // right
 
-    for (i=10;i<287;i++)write_pixel(i+10,100,PALE_YELLOW); // bottom
-    for (i=10;i<287;i++)write_pixel(i+10,101,PALE_YELLOW); // bottom
+    for(i=10;i<151;i++) write_pixel(i+10,180,PALE_YELLOW); // bottom
+    for(i=10;i<151;i++) write_pixel(i+10,181,PALE_YELLOW); // bottom
 
     // title
-	write_text("Quiz Bee!",120,40,WHITE,1);
+	write_text("Quiz Bee!",55,100,WHITE,1);
 
 	//menu options :: borders
     // for (i=30;i<120;i++)write_pixel(i,150,ROYAL_BLUE); // top
@@ -196,15 +196,17 @@ char mainMenu(){
     // for (j=130;j<20;j++)write_pixel(120+10,j+20,ROYAL_BLUE); // left
     // for (j=130;j<20;j++)write_pixel(120+11,j+20,ROYAL_BLUE); // right
     // for (i=120;i<285;i++)write_pixel(i+10,20,PALE_YELLOW); // bottom
-    write_text("[1] Start",120,120,WHITE,0); 
+    write_text("MENU",170,30,WHITE,1); 
 
-    // for (i=190;i<120;i++)write_pixel(i,150,ROYAL_BLUE); // top
-    // for (i=190;i<120;i++)write_pixel(i,151,ROYAL_BLUE); // top
-    // for (j=150;j<20;j++)write_pixel(20,j,ROYAL_BLUE); // left
-    // for (j=150;j<20;j++)write_pixel(21,j,ROYAL_BLUE); // right
-	write_text("[2] High Score",100,140,WHITE,0);
+    write_text("[1] Start",170,50,WHITE,0); 
+	write_text("[2] High Score",170,60,WHITE,0)
+	write_text("[7] Instructions",170,70,WHITE,0);
 
-    write_text("[3] Quit",125,160,WHITE,0);
+    write_text("[3] Quit",170,120,WHITE,0);
+
+    write_text("cmsc125project",170,150,GRAY,0);
+    write_text("abasolo | jerusalem",170,160,GRAY,0);
+
 
     char keypress=(char)getch();
     erase(1,1,400,220); //erase menu
@@ -250,13 +252,6 @@ char questionPanel(int count, char difficulty[], int color, int score, int quest
             if((i + 1) == questionCount){
                 // question lines
                 char line1[32];
-                // char line2[32];
-                // char line3[32];
-                // char line4[32];
-                // char line5[32];
-                // char line6[32];
-                // char line7[32];
-                // char line8[36];
 
                 for(j = 0; j < 8; j++){
                     char line1[32];
@@ -266,39 +261,6 @@ char questionPanel(int count, char difficulty[], int color, int score, int quest
                     write_text(line1,20,50+increment,WHITE,-1);
                     increment+=10;
                 }
-
-                // reading the questions per line
-                // fgets(line1,32,fp);
-                // line1[31] = '\0';
-                // write_text(line1,20,50,WHITE,-1);
-
-                // fgets(line2,32,fp);
-                // line2[31] = '\0';
-                // write_text(line2,20,60,WHITE,-1);
-
-                // fgets(line3,32,fp);
-                // line3[31] = '\0';
-                // write_text(line3,20,70,WHITE,-1);
-
-                // fgets(line4,32,fp);
-                // line4[31] = '\0';
-                // write_text(line4,20,80,WHITE,-1);
-
-                // fgets(line5,32,fp);
-                // line5[31] = '\0';
-                // write_text(line5,20,90,WHITE,-1);
-
-                // fgets(line6,32,fp);
-                // line6[31] = '\0';
-                // write_text(line6,20,100,WHITE,-1);
-
-                // fgets(line7,32,fp);
-                // line7[31] = '\0';
-                // write_text(line7,20,110,WHITE,-1);
-
-                // fgets(line8,36,fp);
-                // line8[31] = '\0';
-                // write_text(line8,20,120,WHITE,-1);
 
                 // reading the answers
                 // for(j = 0; j < 4; j++){
@@ -535,25 +497,12 @@ void generateRandomizedNumber(int limit){
 	int x, index = 0, increment = 10;
 
 	srand(time(NULL));
-
 	while(index < limit){
 		int r = rand() % limit + 1;
-
-        // char scoreToChar[2];
-        // sprintf(scoreToChar, "%ld", r);
-        // write_text(scoreToChar,20 + increment,170,RED,0);   
-        // increment+=10;
-        // char keypress = (char)getch();
-
 		for(x = 0;  x < index;  x++){
-			if(randomNumArray[x] == r){
-				break;
-			}
+			if(randomNumArray[x] == r) break;
 		}
-		
-		if(x == index){
-			randomNumArray[index++] = r;
-		}
+		if(x == index) randomNumArray[index++] = r;
 	}
 }
 
@@ -615,7 +564,6 @@ void highScore(){
     strcpy(line[5], "Player 4");
     strcpy(line[6], "Player 5");
 
-
     // category 2
     strcpy(line[7], "Movie Category");
     // top 5
@@ -659,7 +607,50 @@ void wrongInput(){
 
 // displays the instructions on how the game works.
 void instructionsPanel(){
+    erase(1,1,400,220); //erase menu
+
+	write_text("Instructions",20,20,CYAN,1);
+
+    write_text("Navigation",20,40,CYAN,0);
+    write_text("Press the key inside square",20,50,WHITE,0);
+    write_text("brackets \"[\" and \"]\" to go that",20,60,WHITE,0);
+    write_text("specific menu. ",20,70,WHITE,0);
+
+    write_text("Game Proper",20,90,CYAN,0);
+    write_text("Your name will be asked first.",20,100,WHITE,0);
+    write_text("You can enter lower and uppercase",20,110,WHITE,0);
+    write_text("letters, as well as numbers, and",20,120,WHITE,0);
+    write_text("some symbols. If the character is",20,130,WHITE,0);
+    write_text("not recognized, changes will not",20,140,WHITE,0);
+    write_text("be reflected. You cannot use",20,150,WHITE,0);
+    write_text("backspace. This is a quiz bee",20,160,WHITE,0);
+    write_text("program, not some text editor.",20,170,WHITE,0);
+
+    write_text("Press any key to continue...",40,180,GRAY,0);
+    char stop = (char)getch();
+
+    erase(1,1,400,220); //erase menu
+
+	write_text("Instructions",20,20,CYAN,1);
+
+    write_text("There will be three levels of",20,40,WHITE,0);
+    write_text("difficulty, which will be covered",20,50,WHITE,0);
+    write_text("in a session. There will be five",20,60,WHITE,0);
+    write_text("(5) questions per level. You will",20,70,WHITE,0);
+    write_text("receive: two (2) for easy, three",20,80,WHITE,0);
+    write_text("(3) for average, and five (5) ",20,90,WHITE,0);
+    write_text("points for difficult. After",20,100,WHITE,0);
+    write_text("answering all of the questions,",20,110,WHITE,0);
+    write_text("your score will be recorded.",20,120,WHITE,0);
+
+    write_text("To answer, just press the key",20,135,WHITE,0);
+    write_text("of your choice. ",20,145,WHITE,0);
     
+    write_text("Press \"q\" to quit the session.",20,160,WHITE,0);
+    write_text("Your score will be recorded.",20,170,WHITE,0);
+        
+    write_text("Press any key to continue...",40,180,GRAY,0);
+    char wew = (char)getch();
 }
 
 int mayTamaKa(int score, int increment){
