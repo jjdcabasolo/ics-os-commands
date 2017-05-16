@@ -1,0 +1,66 @@
+A Pokemon can have either one or two types at the same time. This defines to what move type they are weak or strong against. There are currently 18 possible types. Which among these Pokemon is an ice-type and at the same time, a dark-type Pokemon?
+Aurorus
+Articuno
+Froslass
+Weavile
+d
+Generation III consist of the Pokemons introduced in the Ruby, Sapphire, and Emerald versions, all playable on the GameBoy Advance console. Which among these Pokemon is not a Generation III Pokemon?
+Ralts
+Trapinch
+Tropius
+Grotle
+d
+All Pokemons have a specific type, which are the properties for a Pokemon and their moves. Types define to what another type a Pokemon is strong or weak against to a certain move type. A fighting-type Pokemon is highly resistant to what type of moves?
+Normal-type
+Dark-type
+Steel-type
+Fighting-type
+b
+Pokemon X and Y introduced the idea of a Pokemon having a Mega Evolution, undergoing a physical transformation and getting more powerful upon holding an appropriate Mega Stone, except Rayquaza. Which among these Pokemon do not have a mega evolution?
+Pidgeotto
+Aerodactyl
+Mareep
+Dewott
+d
+What ability of a Pokemon keeps the Pokemon perpetually in a drowsing state that prevents it from getting any other status conditions, such as getting paralyzed or being frozen solid?
+Infiltrator
+Clear Body
+Comatose
+Insomnia
+c
+Which of these Pokemons learn the grass-type move "Cotton Spore", which makes the Pokemon release cotton-like spores that cling to their opponent Pokemon that harshly lowers speed, by just merely making the Pokemon evolve to a certain level?
+Hoppip
+Bellsprout
+Cacnea
+Whimsicott
+b
+Legendary Pokemons are a group of incredibly rare and very powerful Pokemon, generally featured prominently in the legends and myths of the Pokemon world. Which legendary Pokemon is considered as the "guardian of the sea" but is not a water-type Pokemon?
+Kyogre
+Lugia
+Manaphy
+Phione
+b
+The Pokemon world consists of several regions, where each has its own list of towns, cities, and landmarks. Which of these locations are not a name of a Pokemon world city?
+Snowpoint
+Vermillion
+Pacifidlog
+Blackthorn
+c
+An event item which is needed for entering the inn in Canalave City. Oddly, the last date marked on it was 50 years ago. It grants access to Pokemon trainers to Newmoon Island, where the Legendary Pokemon Darkrai resides.
+Member Card
+Aurora Ticket
+Liberty Pass
+Inn Pass
+a
+Pokemon regions have mountains where some of the regions' Pokemons reside, especially, the rock-type, ground-type, and dark-type Pokemons and sometimes, a Legendary Pokemon is an inhabitant of it. What is the mountain found in the Sinnoh region?
+Pyre
+Coronet
+Silver
+Moon
+b
+A Pokemon Champion is considered to be the highest known rank for a Pokemon Trainer. In order to be a Champion, a trainer must obtain all 8 Gym Badges and defeat the Elite Four. Who is the Champion of the Kalos League?
+Diantha
+Wallace
+Steven
+Cynthia
+a

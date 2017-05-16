@@ -1,30 +1,60 @@
-what is the first pokemind consectetur adipiscing elit. Cras facilisis condimentum enim non tristique. Nulla velit felis, interdum et dictum et, varius sed lorem. In finibus lectus vitae rutrum molestie. In placerat placerat nisi, velatheasdfasdf
-Answer2-
-Answer3-
-Answer4-
-Answer1-
-a
-shit ipsum dolor sit amet, consectetur adipiscing elit. Cras facilisis condimentum enim non tristique. Nulla velit felis,                                        
-Answer2-
-Answer3-
-Answer4-
-Answer1-
-b
-Lordickem ipsum dolor sit amet, consectetur adipiscing elit. Cras facilisis condimentum enim non tristique. Nulla velit felis, interdum et dictum et, varius sed lorem. In finibus lectus vitae rutrum molestie. In placerat placerat nisi, velathe
-Answer2-
-Answer3-
-Answer4-
-Answer1-
-c
-ass ipsum dolor sit amet, consectetur adipiscing elit. Cras facilisis condimentum enim non tristique. Nulla velit felis, interdum et dictum et, varius sed lorem. In finibus lectus vitae rutrum molestie. In placerat placerat nisi, velathe
-Answer2-
-Answer3-
-Answer4-
-Answer1-
+Which Pokemon is the very first Pokemon listed in the National Pokedex? (Hint: Sort the given Pokemon names alphabetically.)                                                                                                                            
+Charmander   
+Squirtle     
+Pikachu      
+Bulbasaur    
 d
-wew ipsum dolor sit amet, consectetur adipiscing elit. Cras facilisis condimentum enim non tristique. Nulla velit felis, interdum et dictum et, varius sed lorem. In finibus lectus vitae rutrum molestie. In placerat placerat nisi, velathe
-Answer2-
-Answer3-
-Answer4-
-Answer1-
-e
+This fire-type Pokemon is known for its high speed. It is said to be capable of running over 6,200 miles in a single day and night. The fire that blazes within this Pokemon's body is its source of power.                                             
+Arcanine     
+Ninetales    
+Victini      
+Rapidash     
+a
+What Pokemon is both a normal-type and egg-laying Pokemon and is considered as the highest governing person in the University of the Phillipines system?                                                                                                
+Lickitung    
+Jigglypuff   
+Chansey      
+Meowth       
+c
+This Pokemon has an unstable genetic makeup that suddenly mutates due to the environment in which it lives. Radiations from various stones causes this Pokemon to evolve, depending on what type of stone it got in contact with.                       
+Castform     
+Ditto        
+Mew          
+Eevee        
+d
+Roggenrola is a rock-type, mantle Pokemon that has a Sturdy or Weak Armor ability, and is introduced in Pokemon Black and White versions. At level 25, this Pokemon evolves to which Pokemon?                                                           
+Boldore      
+Crustle      
+Golem        
+Aggron       
+a 
+Legendary Pokemons usually do not have any gender, therefore, they cannot be bred with other Pokemons, with the exception of Latios and Latias. Until today, which is the only Legendary Pokemon that can be either a male or a female?                 
+Zygarde      
+Heatran      
+Regigigas    
+Tapu Koko    
+b
+Poke Balls are used by trainers to catch Pokemon. It varies on its catch rate which sometimes depends on the situation and the Pokemon type to be caught. What Poke Ball has a catch rate of a 100%?                                                    
+Premier Ball 
+Master Ball  
+Level Ball   
+Beast Ball   
+b
+Pokemon Professors are experts in their respective regions that specializes on a specific research on a certain aspect about Pokemon. By tradition, they are named after a tree. Which of these Professors resides in the Unova region?                 
+Oak          
+Sycamore     
+Jupiter      
+Kukui        
+c
+It is an electronic device designed to catalogue and provide information regarding the various species of Pokemon featured in the Pokemon video game, anime, and manga series.                                                                          
+PokemonDB    
+PokeStorage  
+Pokedex      
+PokePhone    
+c
+According to the Sinnoh legends, the Pokemon world was created by Arceus, the Alpha Pokemon. It then created several Legendary Pokemons which further formed the world. Which of the following is not a Pokemon region?                                 
+Hoenn        
+Kanto        
+Johto        
+Tokyo        
+d

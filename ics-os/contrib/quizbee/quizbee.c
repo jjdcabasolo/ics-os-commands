@@ -8,6 +8,10 @@ void enterName();            // asks the user of its name - which is utilized in
 void highScore();            // displays the window for highscores on both categories
 
 char questionPanel();         // the window for each of the question
+void evaluateCorrectAnswer();
+void generateRandomizedNumber();
+void displayRandomizedNumber();
+
 int mayTamaKa();                // prompts the user that he/she got the correct answer
 void betterLuckNextTime();    // prompts the user that he/she got the wrong answer
 void wrongInput();        // displays the highscores
@@ -73,13 +77,16 @@ void erase();               // basically covers an area with a black rectangle
 #define GRAY 56
 #define WHITE 63
 
+// GLOBAL VARIABLES
 char name[8];
+char rightAnswer, wrongAnswer1, wrongAnswer2, wrongAnswer3;
+int randomNumArray[10];
 
 int main(){ 
     char keypress = start;
     char categoryChar;
 
-	int i, j, randomNumber = 1;
+	int i, j, randomNumberIndex = 1;
     FILE * fp;
 
 	set_graphics(VGA_320X200X256);
@@ -89,20 +96,35 @@ int main(){
         
         if(keypress == start){
             do{
+                // generateRandomizedNumber(5);
+
                 keypress = category();             
                 categoryChar = keypress;
 
+
                 if(keypress == category1 || keypress == category2){
+                    
                     enterName();
 
-                    int totalScore = 0, increment = 0, quitting = 0, limit = 0;
-                    char rightAnswer, wrongAnswer1, wrongAnswer2, wrongAnswer3;
+                    int totalScore = 0, increment = 0, quitting = 0, limit = 0, flag = 0;
 
                      // traverse the question list :: easy pa lang to shet
                     for(i = 0; i < (question_limit*3); i++){
-                        if(i == 0) increment = ezPanel();
-                        else if(i == 5) increment = avePanel();
-                        else if(i == 10) increment = ggPanel();
+                        if(i == 0){
+                            increment = ezPanel();
+                            flag = 0;
+                            randomNumberIndex = 0;
+                        }
+                        else if(i == 5){
+                            increment = avePanel();
+                            flag = 0;
+                            randomNumberIndex = 0;
+                        }
+                        else if(i == 10){
+                            increment = ggPanel();
+                            flag = 0;
+                            randomNumberIndex = 0;
+                        }
                         
                         // chooses what file to read according to category and difficulty
                         if(i <= 4 && categoryChar == category1){
@@ -130,49 +152,35 @@ int main(){
                             limit = mov_dif_count;
                         }
 
+                        if(flag == 0){
+                            generateRandomizedNumber(limit);
+                            displayRandomizedNumber(limit);
+                            flag = 1;
+                        }
+                        
                         do{
                             // randomize number here
 
                             // displays the question panel with the corresponding category and difficulty
-                            if( i <= 4 ) rightAnswer = questionPanel(fp, (i+1), "Easy", BLUE, totalScore, randomNumber, limit);
-                            else if( i <= 9 ) rightAnswer = questionPanel(fp, (i+1), "Average", GREEN, totalScore, randomNumber, limit);
-                            else if( i <= 14 ) rightAnswer = questionPanel(fp, (i+1), "Difficult", RED, totalScore, randomNumber, limit);
+                            if( i <= 4 ) rightAnswer = questionPanel(fp, (i+1), "Easy", BLUE, totalScore, randomNumArray[randomNumberIndex], limit);
+                            else if( i <= 9 ) rightAnswer = questionPanel(fp, (i+1), "Average", GREEN, totalScore, randomNumArray[randomNumberIndex], limit);
+                            else if( i <= 14 ) rightAnswer = questionPanel(fp, (i+1), "Difficult", RED, totalScore, randomNumArray[randomNumberIndex], limit);
 
                             // gets the input from user in the question panel
                             char keypress=(char)getch();
                             erase(1,1,400,220);
 
-                            // this determines what will be the wrongs answers after reading the correct answer on the file
-                            if(rightAnswer = 'a'){
-                                wrongAnswer1 = 'b';
-                                wrongAnswer2 = 'c';
-                                wrongAnswer3 = 'd';
-                            }
-                            else if(rightAnswer = 'b'){
-                                wrongAnswer1 = 'a';
-                                wrongAnswer2 = 'c';
-                                wrongAnswer3 = 'd';
-                            }
-                            else if(rightAnswer = 'c'){
-                                wrongAnswer1 = 'b';
-                                wrongAnswer2 = 'a';
-                                wrongAnswer3 = 'd';
-                            }
-                            else if(rightAnswer = 'd'){
-                                wrongAnswer1 = 'b';
-                                wrongAnswer2 = 'c';
-                                wrongAnswer3 = 'a';
-                            }
+                            evaluateCorrectAnswer();
 
                             // this evaluates if the answer is correct, wrong, or the user entered an invalid input
                             if(keypress == rightAnswer){
                                 totalScore = mayTamaKa(totalScore, increment);
-                                randomNumber++;
+                                randomNumberIndex++;
                                 break;
                             }
                             else if(keypress == wrongAnswer1 || keypress == wrongAnswer2 || keypress == wrongAnswer3){
                                 betterLuckNextTime();
-                                randomNumber++;
+                                randomNumberIndex++;
                                 break;
                             }
                             else if(keypress != 'a' && keypress != 'b' && keypress != 'c' && keypress != 'd' && keypress != 'q') wrongInput();
@@ -262,7 +270,7 @@ char category(){
 }
 
 char questionPanel(FILE * fp, int count, char difficulty[], int color, int score, int questionCount, int limit){
-    int i = 0;
+    int i = 0, j = 0;
     char correctAnswer[2];
 
     erase(1,1,400,220);
@@ -289,13 +297,13 @@ char questionPanel(FILE * fp, int count, char difficulty[], int color, int score
                 char line5[32];
                 char line6[32];
                 char line7[32];
-                char line8[32];
+                char line8[36];
 
                 // answer
-                char answer1[13];
-                char answer2[13];
-                char answer3[13];
-                char answer4[13];
+                char answer1[16];
+                char answer2[16];
+                char answer3[16];
+                char answer4[16];
 
                 // reading the questions per line
                 fgets(line1,32,fp);
@@ -326,28 +334,31 @@ char questionPanel(FILE * fp, int count, char difficulty[], int color, int score
                 line7[31] = '\0';
                 write_text(line7,20,110,WHITE,-1);
 
-                fgets(line8,32,fp);
+                fgets(line8,36,fp);
                 line8[31] = '\0';
                 write_text(line8,20,120,WHITE,-1);
 
                 // reading the answers
+                // for(j = 0; j < 4; j++){
+
+                // }
                 write_text("a.",20,140,WHITE,0); 
-                fgets(answer1,13,fp);
+                fgets(answer1,16,fp);
                 answer1[12] = '\0';
                 write_text(answer1,40,140,WHITE,0); 
 
                 write_text("b.",20,150,WHITE,0); 
-                fgets(answer2,13,fp);
+                fgets(answer2,16,fp);
                 answer2[12] = '\0';
                 write_text(answer2,40,150,WHITE,0); 
 
                 write_text("c.",170,140,WHITE,0);   
-                fgets(answer3,13,fp);
+                fgets(answer3,16,fp);
                 answer3[12] = '\0';
                 write_text(answer3,190,140,WHITE,0);   
                 
                 write_text("d.",170,150,WHITE,0);   
-                fgets(answer4,13,fp);
+                fgets(answer4,16,fp);
                 answer4[12] = '\0';
                 write_text(answer4,190,150,WHITE,0);   
 
@@ -355,7 +366,7 @@ char questionPanel(FILE * fp, int count, char difficulty[], int color, int score
                 fgets(correctAnswer,2,fp);
                 correctAnswer[1] = '\0';
                 write_text(correctAnswer,210,160,RED,0);   
-                write_text(name,210,170,YELLOW,0);   
+                write_text(name,20,160,YELLOW,0);   
 
                 break;
             }
@@ -363,12 +374,12 @@ char questionPanel(FILE * fp, int count, char difficulty[], int color, int score
                 // gets the question component - the question, 4 possible answers, and the correct answer
                 char dummyQuestion[264];
                 fgets(dummyQuestion,264,fp);
-                char answerCatch[13];
-                fgets(answerCatch,13,fp);
-                fgets(answerCatch,13,fp);
-                fgets(answerCatch,13,fp);
-                fgets(answerCatch,13,fp);
-                fgets(answerCatch,13,fp);
+                char answerCatch[17];
+                fgets(answerCatch,17,fp);
+                fgets(answerCatch,17,fp);
+                fgets(answerCatch,17,fp);
+                fgets(answerCatch,17,fp);
+                fgets(answerCatch,17,fp);
                 char correctAnswerCatch[1];
                 fgets(correctAnswerCatch,1,fp);   
             }
@@ -391,6 +402,30 @@ char questionPanel(FILE * fp, int count, char difficulty[], int color, int score
     write_text("[q] Quit game",165,170,GRAY,0);   
 
     return correctAnswer[0];
+}
+
+// this determines what will be the wrongs answers after reading the correct answer on the file
+void evaluateCorrectAnswer(){
+    if(rightAnswer = 'a'){
+        wrongAnswer1 = 'b';
+        wrongAnswer2 = 'c';
+        wrongAnswer3 = 'd';
+    }
+    else if(rightAnswer = 'b'){
+        wrongAnswer1 = 'a';
+        wrongAnswer2 = 'c';
+        wrongAnswer3 = 'd';
+    }
+    else if(rightAnswer = 'c'){
+        wrongAnswer1 = 'b';
+        wrongAnswer2 = 'a';
+        wrongAnswer3 = 'd';
+    }
+    else if(rightAnswer = 'd'){
+        wrongAnswer1 = 'b';
+        wrongAnswer2 = 'c';
+        wrongAnswer3 = 'a';
+    }
 }
 
 void enterName(){
@@ -447,7 +482,45 @@ void enterName(){
         else if(keypress == '0') write_text("0", j+=10 , 90, WHITE, 1);
 
         notFinished++;
-        k++;
+    }
+
+    name[k] = '\0';
+}
+
+void generateRandomizedNumber(int limit){
+	int x, index = 0, increment = 10;
+
+	srand(time(NULL));
+
+	while(index < limit){
+		int r = rand() % limit + 1;
+
+        // char scoreToChar[2];
+        // sprintf(scoreToChar, "%ld", r);
+        // write_text(scoreToChar,20 + increment,170,RED,0);   
+        // increment+=10;
+        // char keypress = (char)getch();
+
+		for(x = 0;  x < index;  x++){
+			if(randomNumArray[x] == r){
+				break;
+			}
+		}
+		
+		if(x == index){
+			randomNumArray[index++] = r;
+		}
+	}
+}
+
+void displayRandomizedNumber(int limit){
+    int increment = 10;
+    for(int i = 0; i < limit; i++){
+        char scoreToChar[2];
+        sprintf(scoreToChar, "%ld", randomNumArray[i]);
+        write_text(scoreToChar,20 + increment,170,YELLOW,0);   
+        increment+=10;
+        char keypress = (char)getch();
     }
 }
 
