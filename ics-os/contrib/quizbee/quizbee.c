@@ -13,6 +13,7 @@ void generateRandomizedNumber(int limit);
 void displayRandomizedNumber(int limit);
 void chooseFileToRead(int i, char categoryChar);
 void setSettingsForDifficulty(int i);
+void instructionsPanel();
 
 int mayTamaKa();                // prompts the user that he/she got the correct answer
 void betterLuckNextTime();    // prompts the user that he/she got the wrong answer
@@ -32,6 +33,7 @@ void erase();               // basically covers an area with a black rectangle
 #define start '1'
 #define high_score '2'
 #define quit_game '3'
+#define instruction_menu '7'
 
 // categories
 #define category1 '4'
@@ -84,7 +86,7 @@ void erase();               // basically covers an area with a black rectangle
 #define WHITE 63
 
 // GLOBAL VARIABLES
-char name[8], rightAnswerText[16], answer1[16], answer2[16], answer3[16], answer4[16];
+char name[8], rightAnswerText[16], answer1[16], answer2[16], answer3[16], answer4[16], correctAnswer[2];
 char rightAnswer, wrongAnswer1, wrongAnswer2, wrongAnswer3;
 int randomNumArray[10];
 int  limit = 0, increment = 0, randomNumberIndex = 1, flag = 0;;
@@ -154,6 +156,7 @@ int main(){
             }while(keypress != return_main_menu);
         }
         else if(keypress == high_score) highScore();
+        else if(keypress == instruction_menu) instructionsPanel();
         else if(keypress == quit_game) byeUserManggagamit();
 
         // reset the integers used
@@ -229,7 +232,6 @@ char category(){
 // @ param: int count = determines the question count
 char questionPanel(int count, char difficulty[], int color, int score, int questionCount, int limit){
     int i = 0, j = 0;
-    char correctAnswer[2];
 
     erase(1,1,400,220);
 
@@ -369,12 +371,13 @@ void evaluateCorrectAnswer(){
         wrongAnswer2 = 'c';
         wrongAnswer3 = 'd';
 
-        rightAnswerText[0] = choice_1;
-        rightAnswerText[1] = '.';
-        rightAnswerText[2] = ' ';
-        for(i = 3; i < 16; i++){
-            rightAnswerText[i] = answer1[i-3];
-        }
+        // rightAnswerText[0] = choice_1;
+        // rightAnswerText[1] = '.';
+        // rightAnswerText[2] = ' ';
+        // for(i = 3; i < 16; i++){
+        //     rightAnswerText[i] = answer1[i-3];
+        // }
+        strcpy(rightAnswerText, answer1);
     }
     else if(rightAnswer == choice_2){
         // char line1[30] = "the answer is bb";
@@ -385,12 +388,13 @@ void evaluateCorrectAnswer(){
         wrongAnswer2 = 'c';
         wrongAnswer3 = 'd';
 
-        rightAnswerText[0] = choice_2;
-        rightAnswerText[1] = '.';
-        rightAnswerText[2] = ' ';
-        for(i = 3; i < 16; i++){
-            rightAnswerText[i] = answer2[i-3];
-        }
+        // rightAnswerText[0] = choice_2;
+        // rightAnswerText[1] = '.';
+        // rightAnswerText[2] = ' ';
+        // for(i = 3; i < 16; i++){
+        //     rightAnswerText[i] = answer2[i-3];
+        // }
+        strcpy(rightAnswerText, answer2);
     }
     else if(rightAnswer == choice_3){
         // char line1[30] = "the answer is ccccccccc";
@@ -401,12 +405,13 @@ void evaluateCorrectAnswer(){
         wrongAnswer2 = 'a';
         wrongAnswer3 = 'd';
 
-        rightAnswerText[0] = choice_3;
-        rightAnswerText[1] = '.';
-        rightAnswerText[2] = ' ';
-        for(i = 3; i < 16; i++){
-            rightAnswerText[i] = answer3[i-3];
-        }
+        // rightAnswerText[0] = choice_3;
+        // rightAnswerText[1] = '.';
+        // rightAnswerText[2] = ' ';
+        // for(i = 3; i < 16; i++){
+        //     rightAnswerText[i] = answer3[i-3];
+        // }
+        strcpy(rightAnswerText, answer3);
     }
     else if(rightAnswer == choice_4){
         // char line1[30] = "the answer is d";
@@ -417,12 +422,13 @@ void evaluateCorrectAnswer(){
         wrongAnswer2 = 'c';
         wrongAnswer3 = 'a';
 
-        rightAnswerText[0] = choice_4;
-        rightAnswerText[1] = '.';
-        rightAnswerText[2] = ' ';
-        for(i = 3; i < 16; i++){
-            rightAnswerText[i] = answer4[i-3];
-        }
+        // rightAnswerText[0] = choice_4;
+        // rightAnswerText[1] = '.';
+        // rightAnswerText[2] = ' ';
+        // for(i = 3; i < 16; i++){
+        //     rightAnswerText[i] = answer4[i-3];
+        // }
+        strcpy(rightAnswerText, answer4);
     }
 }
 
@@ -632,6 +638,11 @@ void wrongInput(){
     char stop = (char)getch();  
 }
 
+// displays the instructions on how the game works.
+void instructionsPanel(){
+    
+}
+
 int mayTamaKa(int score, int increment){
     erase(1,1,400,220); //erase menu
 
@@ -655,7 +666,9 @@ void betterLuckNextTime(){
     write_text("Wrong!!!",120,80,RED,1);
     write_text("The correct answer is",70,100,WHITE,0);
 
-    write_text(rightAnswerText,120,110,WHITE,0);
+    write_text(correctAnswer,120,110,WHITE,0);
+    write_text(". ",130,110,WHITE,0);
+    write_text(rightAnswerText,150,110,WHITE,0);
 
     write_text("Press any key to continue...",35,150,GRAY,0);
     char stop = (char)getch();
