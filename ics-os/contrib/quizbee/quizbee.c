@@ -555,21 +555,40 @@ void instructionsPanel(){
     write_text("There will be three levels of",20,40,WHITE,0);
     write_text("difficulty, which will be covered",20,50,WHITE,0);
     write_text("in a session. There will be five",20,60,WHITE,0);
-    write_text("(5) questions per level. You will",20,70,WHITE,0);
-    write_text("receive: two (2) for easy, three",20,80,WHITE,0);
-    write_text("(3) for average, and five (5) ",20,90,WHITE,0);
-    write_text("points for difficult. After",20,100,WHITE,0);
-    write_text("answering all of the questions,",20,110,WHITE,0);
-    write_text("your score will be recorded.",20,120,WHITE,0);
+    write_text("(5) questions per level.",20,70,WHITE,0);
 
-    write_text("To answer, just press the key",20,135,WHITE,0);
-    write_text("of your choice. ",20,145,WHITE,0);
-    
-    write_text("Press \"q\" to quit the session.",20,160,WHITE,0);
-    write_text("Your score will be recorded.",20,170,WHITE,0);
+    write_text("Scoring System",20,90,CYAN,0);
+    write_text("two (2) for easy",20,100,WHITE,0);
+    write_text("three (3) for average",20,110,WHITE,0);
+    write_text("five (5) for difficult",20,120,WHITE,0);
+
+    write_text("Answering",20,140,CYAN,0);
+    write_text("Press [a] [b] [c] or [d] to ",20,150,WHITE,0);
+    write_text("answer the question.",20,160,WHITE,0);
         
     write_text("Press any key to continue...",40,180,GRAY,0);
     char wew = (char)getch();
+
+    erase(1,1,400,220); //erase menu
+
+	write_text("Instructions",20,20,CYAN,1);
+
+    write_text("Quitting",20,40,CYAN,0);
+    write_text("Press [q] to quit the session.",20,50,WHITE,0);
+    write_text("Your score will be recorded.",20,60,WHITE,0);
+
+    write_text("Power Up",20,80,CYAN,0);
+    write_text("You are granted three ",20,90,WHITE,0);
+    write_text("charges of skips - this skips",20,100,WHITE,0);
+    write_text("a question, resulting to a",20,110,WHITE,0);
+    write_text("correct answer. Once empty, ",20,120,WHITE,0);
+    write_text("it can no longer be used.",20,130,WHITE,0);
+
+    write_text("Have fun answering the quiz!",20,150,WHITE,0);
+    write_text("#ICSOSIsLife #ICSOSBestOS",20,160,WHITE,0);
+        
+    write_text("Press any key to continue...",40,180,GRAY,0);
+    char huhu = (char)getch();
 }
 
 int mayTamaKa(int score, int increment){
@@ -638,8 +657,8 @@ void walaNaTamaNa(){
     for(i=10;i<287+2;i++) write_pixel(i+10,60+20+50+1,BROWN); // bottom
 
     write_text("TAMA NA!!!",120,80,BROWN,1);
-    write_text("Wala ka nang skip. Staph.",50,100,WHITE,0);
-    write_text("No more skips. Oks lang yan.",50,110,WHITE,0);
+    write_text("Wala ka nang skip. Staph.",45,100,WHITE,0);
+    write_text("No more skips. Oks lang yan.",45,110,WHITE,0);
     
     write_text("Press any key to continue...",35,160,GRAY,0);
     char stop = (char)getch();
