@@ -1,96 +1,4 @@
-#include "../../sdk/dexsdk.h"
-#include "../../sdk/time.h"
-
-// PROTOTYPES
-char mainMenu();                // displays the main menu - returns the coice of the user
-char category();                // displays the window for picking the category
-void enterName();            // asks the user of its name - which is utilized in the highscore panel
-void highScore();            // displays the window for highscores on both categories
-
-void evaluateCorrectAnswer();
-char questionPanel(int count, char difficulty[], int color, int score, int questionCount, int limit);         // the window for each of the question
-void generateRandomizedNumber(int limit);
-void displayRandomizedNumber(int limit);
-void chooseFileToRead(int i, char categoryChar);
-void setSettingsForDifficulty(int i);
-void instructionsPanel();
-
-int mayTamaKa();                // prompts the user that he/she got the correct answer
-void betterLuckNextTime();    // prompts the user that he/she got the wrong answer
-void wrongInput();        // displays the highscores
-void quitter();     // displays the window if the user quits in the middle of the game
-
-int ezPanel();          // baka naman i-mali mo pa!?
-int avePanel();     // kebs lang. 
-int ggPanel();          // syempre hinirapan namin, ano?
-void totalScorePanel();   // tapusin mo man o hindi, ija-judge ka pa rin. 
-void byeUserManggagamit();    // parting is such sweet sorrow. :(
-
-void erase();               // basically covers an area with a black rectangle
-
-// CONSTANTS
-// main menu
-#define start '1'
-#define high_score '2'
-#define quit_game '3'
-#define instruction_menu '7'
-
-// categories
-#define category1 '4'
-#define category2 '5'
-#define return_main_menu '6'
-
-// number of questions per category
-#define question_limit 5
-#define quit 'q'
-#define choice_1 'a'
-#define choice_2 'b'
-#define choice_3 'c'
-#define choice_4 'd'
-
-// questionCount
-#define pkmn_ez_count 10
-#define pkmn_ave_count 10
-#define pkmn_dif_count 10
-#define mov_ez_count 10
-#define mov_ave_count 10
-#define mov_dif_count 10
-
-// scores
-#define EZ_SCORE 2
-#define AVE_SCORE 3
-#define DIFF_SCORE 5
-
-// colors!!!
-#define BLACK 0
-#define BLUE 1
-#define GREEN 2
-#define CYAN 3
-#define RED 4
-#define MAGENTA 5
-#define BROWN 6
-#define LIGHTGRAY 7
-#define DARKGRAY 8
-#define LIGHTBLUE 9
-#define LIGHTGREEN 10
-#define LIGHTCYAN 11
-#define LIGHTRED 12
-#define LIGHTMAGENTA 13
-#define DARK_YELLOW 14
-#define BLINK 128
-#define YELLOW 54
-#define PALE_YELLOW 62
-#define ROYAL_BLUE 1
-#define DARK_BLUE 8
-#define GRAY 56
-#define WHITE 63
-
-// GLOBAL VARIABLES
-char name[8], rightAnswerText[16], answer1[16], answer2[16], answer3[16], answer4[16], correctAnswer[2];
-char rightAnswer, wrongAnswer1, wrongAnswer2, wrongAnswer3;
-int randomNumArray[10];
-int  limit = 0, increment = 0, randomNumberIndex = 1, flag = 0;;
-FILE * fp;
+#include "quizbee.h"
 
 int main(){ 
     char keypress = start;
@@ -102,7 +10,7 @@ int main(){
 
 	do{
         keypress = mainMenu();
-        
+
         if(keypress == start){
             do{
                 keypress = category();             
@@ -133,7 +41,7 @@ int main(){
                             // displays the question panel with the corresponding category and difficulty, returns the correct answer
                             if( i <= 4 ) rightAnswer = questionPanel((i+1), "Easy", LIGHTCYAN, totalScore, randomNumArray[randomNumberIndex], limit);
                             else if( i <= 9 ) rightAnswer = questionPanel((i+1), "Average", LIGHTBLUE, totalScore, randomNumArray[randomNumberIndex], limit);
-                            else if( i <= 14 ) rightAnswer = questionPanel((i+1), "Difficult", BLUE, totalScore, randomNumArray[randomNumberIndex], limit);
+                            else if( i <= 14 ) rightAnswer = questionPanel((i+1), "Difficult", LIGHTGRAY, totalScore, randomNumArray[randomNumberIndex], limit);
 
                             // gets the input from user in the question panel
                             keypress = (char)getch();
@@ -145,16 +53,21 @@ int main(){
                             // this evaluates if the answer is correct, wrong, or the user entered an invalid input
                             if(keypress == rightAnswer){ totalScore = mayTamaKa(totalScore, increment); randomNumberIndex++; break; }
                             else if(keypress == wrongAnswer1 || keypress == wrongAnswer2 || keypress == wrongAnswer3){ betterLuckNextTime(); randomNumberIndex++; break; }
-                            else if(keypress == quit){ quitter(); quitting = 1; break; }
+                            else if(keypress == skip_question && skipCount > 0){ totalScore = gumamitNgPowerUp(totalScore, increment); randomNumberIndex++; skipCount--; break; }
+                            else if(keypress == quit){ quitting = 1; break; }
+                            else if(keypress == skip_question && skipCount == 0) walaNaTamaNa();
                             else  wrongInput();
                             
                             // if the player presses quit, terminates the progress but saves the score
                         }while(keypress != 'a' && keypress != 'b' && keypress != 'c' && keypress != 'd' && keypress != 'q');
-                        if(quitting == 1){ totalScore = 0; quitting = 0; break; } // resets highscore and the quitting flag
+                        if(quitting == 1){ totalScore = 0; break; } // resets highscore and the quitting flag
                     }
 
+                    if(quitting == 1){ quitter(totalScore); quitting = 0; }
+                    else totalScorePanel(totalScore);
+                    
+                    skipCount = 3;
                     // TODO: Write to file - highscores
-                    totalScorePanel(totalScore);
                 }
             }while(keypress != return_main_menu);
         }
@@ -317,8 +230,13 @@ char questionPanel(int count, char difficulty[], int color, int score, int quest
     sprintf(scoreToChar, "%ld", score);
     write_text(scoreToChar,80,170,YELLOW,0);   
     
+    write_text("Skips:",110,170,WHITE,0);   
+    char skipToChar[2];
+    sprintf(skipToChar, "%ld", skipCount);
+    write_text(skipToChar,170,170,YELLOW,0);     
+
     // quitting station
-    write_text("[q] Quit game",170,170,GRAY,0);   
+    write_text("[q] Quit",225,170,GRAY,0);   
 
     return correctAnswer[0];
 }
@@ -374,19 +292,15 @@ void setSettingsForDifficulty(int i){
 }
 
 void enterName(){
-    int j = 90, notFinished = 0;
+    int j = 90, notFinished = 0, k = 0;
 
-    write_text("Enter Name : ",20,50,WHITE,1);
+    write_text("Enter Name: ",20,50,CYAN,1);
     write_text("(at most eight characters only)",20,70,WHITE,0);
     write_text("Press enter to start.",120,170,GRAY,0);
-
-    int k = 0;
 
     while (notFinished != 8){
         char keypress = (char)getch();
         name[k] = keypress;
-        // k++;
-        // notFinished++;
 
         // the user entered enter
         if(keypress == 10){ name[k] = '\0'; break; }
@@ -592,11 +506,21 @@ void highScore(){
 void wrongInput(){
     erase(1,1,400,220); //erase menu
 
+    int i = 0, j = 0;
+    for(i=10;i<287;i++) write_pixel(i+10,10+50,GRAY); // top
+    for(i=10;i<287;i++) write_pixel(i+10,10+50+1,GRAY); // top
+    for(j=40;j<110;j++) write_pixel(10+10,j+20,GRAY); // left
+    for(j=40;j<110;j++) write_pixel(10+11,j+20,GRAY); // left
+    for(j=40;j<110;j++) write_pixel(287+10,j+20,GRAY); // right
+    for(j=40;j<110;j++) write_pixel(287+11,j+20,GRAY); // right
+    for(i=10;i<287+2;i++) write_pixel(i+10,60+20+50,GRAY); // bottom
+    for(i=10;i<287+2;i++) write_pixel(i+10,60+20+50+1,GRAY); // bottom
+
     write_text("Ayusin ang input :(",80,80,GRAY,1);
-    write_text("a, b, c, d, or q",90,100,WHITE,0);
-    write_text("lang ang choices.",90,110,WHITE,0);
+    write_text("Choices: [a] [b] [c] [d]",50,100,WHITE,0);
+    write_text("Skip: [s]      Quit: [q]",50,110,WHITE,0);
     
-    write_text("Press any key to continue...",35,150,GRAY,0);
+    write_text("Press any key to continue...",35,160,GRAY,0);
     char stop = (char)getch();  
 }
 
@@ -651,43 +575,122 @@ void instructionsPanel(){
 int mayTamaKa(int score, int increment){
     erase(1,1,400,220); //erase menu
 
-    write_text("Correct!!!",120,80,YELLOW,1);
+    int i = 0, j = 0;
+    for(i=10;i<287;i++) write_pixel(i+10,10+50,GREEN); // top
+    for(i=10;i<287;i++) write_pixel(i+10,10+50+1,GREEN); // top
+    for(j=40;j<110;j++) write_pixel(10+10,j+20,GREEN); // left
+    for(j=40;j<110;j++) write_pixel(10+11,j+20,GREEN); // left
+    for(j=40;j<110;j++) write_pixel(287+10,j+20,GREEN); // right
+    for(j=40;j<110;j++) write_pixel(287+11,j+20,GREEN); // right
+    for(i=10;i<287+2;i++) write_pixel(i+10,60+20+50,GREEN); // bottom
+    for(i=10;i<287+2;i++) write_pixel(i+10,60+20+50+1,GREEN); // bottom
+
+    write_text("Correct!!!",120,80,GREEN,1);
     write_text("You have earned",40,100,WHITE,0);
     
     char scoreToChar[2];
     sprintf(scoreToChar, "%ld", increment);
     write_text(scoreToChar,190,100,WHITE,0);
-
     write_text("points.",220,100,WHITE,0);
     
-    write_text("Press any key to continue...",35,150,GRAY,0);
+    write_text("Press any key to continue...",35,160,GRAY,0);
     char stop = (char)getch();
     return score + increment;
+}
+
+int gumamitNgPowerUp(int score, int increment){
+    erase(1,1,400,220); //erase menu
+
+    int i = 0, j = 0;
+    for(i=10;i<287;i++) write_pixel(i+10,10+50,CYAN); // top
+    for(i=10;i<287;i++) write_pixel(i+10,10+50+1,CYAN); // top
+    for(j=40;j<110;j++) write_pixel(10+10,j+20,CYAN); // left
+    for(j=40;j<110;j++) write_pixel(10+11,j+20,CYAN); // left
+    for(j=40;j<110;j++) write_pixel(287+10,j+20,CYAN); // right
+    for(j=40;j<110;j++) write_pixel(287+11,j+20,CYAN); // right
+    for(i=10;i<287+2;i++) write_pixel(i+10,60+20+50,CYAN); // bottom
+    for(i=10;i<287+2;i++) write_pixel(i+10,60+20+50+1,CYAN); // bottom
+
+    write_text("Skipped!!!",120,80,CYAN,1);
+    write_text("You have earned",40,100,WHITE,0);
+    
+    char scoreToChar[2];
+    sprintf(scoreToChar, "%ld", increment);
+    write_text(scoreToChar,190,100,WHITE,0);
+    write_text("points.",220,100,WHITE,0);
+    
+    write_text("Press any key to continue...",35,160,GRAY,0);
+    char stop = (char)getch();
+    return score + increment;
+}
+
+void walaNaTamaNa(){
+    erase(1,1,400,220); //erase menu
+
+    int i = 0, j = 0;
+    for(i=10;i<287;i++) write_pixel(i+10,10+50,BROWN); // top
+    for(i=10;i<287;i++) write_pixel(i+10,10+50+1,BROWN); // top
+    for(j=40;j<110;j++) write_pixel(10+10,j+20,BROWN); // left
+    for(j=40;j<110;j++) write_pixel(10+11,j+20,BROWN); // left
+    for(j=40;j<110;j++) write_pixel(287+10,j+20,BROWN); // right
+    for(j=40;j<110;j++) write_pixel(287+11,j+20,BROWN); // right
+    for(i=10;i<287+2;i++) write_pixel(i+10,60+20+50,BROWN); // bottom
+    for(i=10;i<287+2;i++) write_pixel(i+10,60+20+50+1,BROWN); // bottom
+
+    write_text("TAMA NA!!!",120,80,BROWN,1);
+    write_text("Wala ka nang skip. Staph.",50,100,WHITE,0);
+    write_text("No more skips. Oks lang yan.",50,110,WHITE,0);
+    
+    write_text("Press any key to continue...",35,160,GRAY,0);
+    char stop = (char)getch();
 }
 
 void betterLuckNextTime(){
     erase(1,1,400,220); //erase menu
 
-    write_text("Wrong!!!",120,80,RED,1);
+    int i = 0, j = 0;
+    for(i=10;i<287;i++) write_pixel(i+10,10+50,RED); // top
+    for(i=10;i<287;i++) write_pixel(i+10,10+50+1,RED); // top
+    for(j=40;j<110;j++) write_pixel(10+10,j+20,RED); // left
+    for(j=40;j<110;j++) write_pixel(10+11,j+20,RED); // left
+    for(j=40;j<110;j++) write_pixel(287+10,j+20,RED); // right
+    for(j=40;j<110;j++) write_pixel(287+11,j+20,RED); // right
+    for(i=10;i<287+2;i++) write_pixel(i+10,60+20+50,RED); // bottom
+    for(i=10;i<287+2;i++) write_pixel(i+10,60+20+50+1,RED); // bottom
+    write_text("Wrong!!!",125,80,RED,1);
     write_text("The correct answer is",70,100,WHITE,0);
 
-    write_text(correctAnswer,120,110,WHITE,0);
-    write_text(". ",130,110,WHITE,0);
-    write_text(rightAnswerText,150,110,WHITE,0);
+    write_text(correctAnswer,70,110,WHITE,0);
+    write_text(". ",80,110,WHITE,0);
+    write_text(rightAnswerText,100,110,WHITE,0);
 
-    write_text("Press any key to continue...",35,150,GRAY,0);
+    write_text("Press any key to continue...",35,160,GRAY,0);
     char stop = (char)getch();
 }
 
-void quitter(){
-    erase(1,1,400,220); //erase menu
+void quitter(int score){
+    erase(1,1,400,220);
+    
+    write_text("Quitter!",125,30,MAGENTA,1);
+    write_text("You have earned a total of ",40,50,WHITE,0);
+    
+    int i = 0, j = 0;
+    for(i=100;i<195;i++) write_pixel(i+10,20+50,MAGENTA); // top
+    for(i=100;i<195;i++) write_pixel(i+10,20+50+1,MAGENTA); // top
+    for(j=50;j<110;j++) write_pixel(100+10,j+20,MAGENTA); // left
+    for(j=50;j<110;j++) write_pixel(100+11,j+20,MAGENTA); // left
+    for(j=50;j<110;j++) write_pixel(195+10,j+20,MAGENTA); // right
+    for(j=50;j<110;j++) write_pixel(195+11,j+20,MAGENTA); // right
+    for(i=100;i<195+2;i++) write_pixel(i+10,60+20+50,MAGENTA); // bottom
+    for(i=100;i<195+2;i++) write_pixel(i+10,60+20+50+1,MAGENTA); // bottom
+    char scoreToChar[2];
+    sprintf(scoreToChar, "%ld", score);
+    write_text(scoreToChar,150,80,YELLOW,1);
+    write_text("points!!!",120,100,WHITE,1);
 
-    write_text("Quitter!",120,50,RED,1);
-    write_text("BOO!!!",130,70,WHITE,0);
-    write_text("You have ended your session.",35,100,WHITE,0);
-    write_text("Your score will be saved.",40,110,WHITE,0);
+    write_text("Good job!",120,140,WHITE,0);
 
-    write_text("Press any key to continue...",35,150,GRAY,0);
+    write_text("Press any key to continue...",35,160,GRAY,0);
     char stop = (char)getch();
 }
 
@@ -703,7 +706,7 @@ int ezPanel(){
     for(j=0;j<160;j++) write_pixel(150+11,j+20,LIGHTCYAN); // right
     for(i=10;i<152;i++) write_pixel(i+10,180,LIGHTCYAN); // bottom
     for(i=10;i<152;i++) write_pixel(i+10,181,LIGHTCYAN); // bottom
-	write_text("Easy",40,85,WHITE,1);
+	write_text("Easy",70,85,WHITE,1);
 	write_text("round!!!!",50,100,WHITE,1);
 
     write_text("You will earn",170,40,WHITE,0);
@@ -729,7 +732,7 @@ int ezPanel(){
 
 int avePanel(){
     erase(1,1,400,220);
-
+    
     int i = 0, j = 0;
     for(i=10;i<150;i++) write_pixel(i+10,20,LIGHTBLUE); // top
     for(i=10;i<150;i++) write_pixel(i+10,21,LIGHTBLUE); // top
@@ -739,14 +742,16 @@ int avePanel(){
     for(j=0;j<160;j++) write_pixel(150+11,j+20,LIGHTBLUE); // right
     for(i=10;i<152;i++) write_pixel(i+10,180,LIGHTBLUE); // bottom
     for(i=10;i<152;i++) write_pixel(i+10,181,LIGHTBLUE); // bottom
-	write_text("Average round!!!!",40,100,WHITE,1);
+	write_text("Average",55,85,WHITE,1);
+	write_text("round!!!!",50,100,WHITE,1);
 
-    write_text("You will earn",170,50,WHITE,0);
+    write_text("You will earn",170,40,WHITE,0);
     char scoreToChar[2];
     sprintf(scoreToChar, "%ld", AVE_SCORE);
-    write_text(scoreToChar,190,60,LIGHTCYAN,1);
-    write_text("pts for",200,65,WHITE,0);
-    write_text("a correct answer!",170,75,WHITE,0);
+    write_text(scoreToChar,190,50,LIGHTBLUE,1);
+    write_text("pts",200,55,WHITE,0);
+    write_text("for a correct",170,65,WHITE,0);
+    write_text("answer!",170,75,WHITE,0);
 
     write_text("Otherwise,",170,90,WHITE,0);
     write_text("no points will",170,100,WHITE,0);
@@ -765,22 +770,24 @@ int ggPanel(){
     erase(1,1,400,220);
     
     int i = 0, j = 0;
-    for(i=10;i<150;i++) write_pixel(i+10,20,BLUE); // top
-    for(i=10;i<150;i++) write_pixel(i+10,21,BLUE); // top
-    for(j=0;j<160;j++) write_pixel(10+10,j+20,BLUE); // left
-    for(j=0;j<160;j++) write_pixel(10+11,j+20,BLUE); // left
-    for(j=0;j<160;j++) write_pixel(150+10,j+20,BLUE); // right
-    for(j=0;j<160;j++) write_pixel(150+11,j+20,BLUE); // right
-    for(i=10;i<152;i++) write_pixel(i+10,180,BLUE); // bottom
-    for(i=10;i<152;i++) write_pixel(i+10,181,BLUE); // bottom
-	write_text("Difficult round!!!!",35,100,WHITE,1);
+    for(i=10;i<150;i++) write_pixel(i+10,20,LIGHTGRAY); // top
+    for(i=10;i<150;i++) write_pixel(i+10,21,LIGHTGRAY); // top
+    for(j=0;j<160;j++) write_pixel(10+10,j+20,LIGHTGRAY); // left
+    for(j=0;j<160;j++) write_pixel(10+11,j+20,LIGHTGRAY); // left
+    for(j=0;j<160;j++) write_pixel(150+10,j+20,LIGHTGRAY); // right
+    for(j=0;j<160;j++) write_pixel(150+11,j+20,LIGHTGRAY); // right
+    for(i=10;i<152;i++) write_pixel(i+10,180,LIGHTGRAY); // bottom
+    for(i=10;i<152;i++) write_pixel(i+10,181,LIGHTGRAY); // bottom
+	write_text("Difficult",50,85,WHITE,1);
+	write_text("round!!!!",50,100,WHITE,1);
 
-    write_text("You will earn",170,50,WHITE,0);
+    write_text("You will earn",170,40,WHITE,0);
     char scoreToChar[2];
-    sprintf(scoreToChar, "%ld", AVE_SCORE);
-    write_text(scoreToChar,190,60,BLUE,1);
-    write_text("pts for",200,65,WHITE,0);
-    write_text("a correct answer!",170,75,WHITE,0);
+    sprintf(scoreToChar, "%ld", DIFF_SCORE);
+    write_text(scoreToChar,190,50,LIGHTGRAY,1);
+    write_text("pts",200,55,WHITE,0);
+    write_text("for a correct",170,65,WHITE,0);
+    write_text("answer!",170,75,WHITE,0);
 
     write_text("Otherwise,",170,90,WHITE,0);
     write_text("no points will",170,100,WHITE,0);
@@ -798,24 +805,32 @@ int ggPanel(){
 void totalScorePanel(int score){
     erase(1,1,400,220);
     
-    write_text("Finished!",120,40,YELLOW,1);
-    write_text("You have earned a total of ",40,60,WHITE,0);
+    write_text("Finished!",120,30,CYAN,1);
+    write_text("You have earned a total of ",40,50,WHITE,0);
     
+    int i = 0, j = 0;
+    for(i=100;i<195;i++) write_pixel(i+10,20+50,CYAN); // top
+    for(i=100;i<195;i++) write_pixel(i+10,20+50+1,CYAN); // top
+    for(j=50;j<110;j++) write_pixel(100+10,j+20,CYAN); // left
+    for(j=50;j<110;j++) write_pixel(100+11,j+20,CYAN); // left
+    for(j=50;j<110;j++) write_pixel(195+10,j+20,CYAN); // right
+    for(j=50;j<110;j++) write_pixel(195+11,j+20,CYAN); // right
+    for(i=100;i<195+2;i++) write_pixel(i+10,60+20+50,CYAN); // bottom
+    for(i=100;i<195+2;i++) write_pixel(i+10,60+20+50+1,CYAN); // bottom
     char scoreToChar[2];
     sprintf(scoreToChar, "%ld", score);
-
-    write_text(scoreToChar,140,90,YELLOW,1);
+    write_text(scoreToChar,150,80,YELLOW,1);
     write_text("points!!!",120,100,WHITE,1);
 
     write_text("Good job!",120,140,WHITE,0);
 
-    write_text("Press any key to continue...",35,150,GRAY,0);
+    write_text("Press any key to continue...",35,160,GRAY,0);
     char stop = (char)getch();
 }
 
 void byeUserManggagamit(){
     erase(1,1,400,220);
-    write_text("BYE!",150,80,RED,1);
+    write_text("BYE!",140,80,RED,1);
     write_text("Press any key to exit...",55,150,GRAY,0);
     char stop = (char)getch();
 }

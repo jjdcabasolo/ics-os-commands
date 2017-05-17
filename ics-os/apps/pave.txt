@@ -48,7 +48,7 @@ Blackthorn
 c
 An event item which is needed for entering the inn in Canalave City. Oddly, the last date marked on it was 50 years ago. It grants access to Pokemon trainers to Newmoon Island, where the Legendary Pokemon Darkrai resides.                           
 Member Card  
-Aurora Ticket
+AuroraTicket
 Liberty Pass 
 Inn Pass     
 a
