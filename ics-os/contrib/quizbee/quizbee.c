@@ -63,11 +63,13 @@ int main(){
                         if(quitting == 1){ totalScore = 0; break; } // resets highscore and the quitting flag
                     }
 
-                    if(quitting == 1){ quitter(totalScore); quitting = 0; }
-                    else totalScorePanel(totalScore);
+                    if(quitting == 1){ quitter(totalScore); quitting = 0; } // if the player quits
+                    else totalScorePanel(totalScore); // shows total score
                     
+                    // Write in a .bin file - highscores, whether the player finishes the game or not.
+                    if(categoryChar == category1) writeToFilePKMN(totalScore);
+                    else if(categoryChar == category2) writeToFileMOV(totalScore);
                     skipCount = 3;
-                    // TODO: Write to file - highscores
                 }
             }while(keypress != return_main_menu);
         }
@@ -75,6 +77,8 @@ int main(){
         else if(keypress == instruction_menu) instructionsPanel();
         else if(keypress == quit_game) byeUserManggagamit();
 	} while (keypress != quit_game);
+
+    // freeMallocsPKMN();
 
 	set_graphics(VGA_TEXT80X25X16);
 	clrscr();
@@ -99,11 +103,11 @@ char mainMenu(){
 	write_text("Quiz Bee!",55,100,WHITE,1);
     write_text("MENU",170,30,BLUE,1); 
 
-    write_text("[1] Start",170,50,WHITE,0); 
-	write_text("[2] High Score",170,60,WHITE,0);
-	write_text("[7] Instructions",170,70,WHITE,0);
+	write_text("[2] High Score",170,50,WHITE,0);
+	write_text("[7] Instructions",170,60,WHITE,0);
+    write_text("[3] Quit",170,70,WHITE,0);
 
-    write_text("[3] Quit",170,100,WHITE,0);
+    write_text("[1] Start!!!",170,95,LIGHTGRAY,1); 
 
     write_text("cmsc125project",170,130,GRAY,0);
     write_text("abasolo +",170,140,GRAY,0);
@@ -455,52 +459,251 @@ void chooseFileToRead(int i, char categoryChar){
     }
 }
 
+void writeToFilePKMN(int score){
+    char scoreToChar[3];
+    sprintf(scoreToChar, "%ld", score);
+    
+	// file writing -- highscores 
+	fp = fopen("highsp.bin", "ab");
+
+	// // writing nung name nung player
+	unsigned short sizeOfString = strlen(name) + 1;
+	fwrite(&sizeOfString, sizeof(unsigned short), 1, fp);	//the string length + 1 for the null terminator
+	fwrite(name, sizeof(char), sizeOfString, fp);			//write the string
+
+	// writing nung score nung player
+	unsigned short sizeOfNum = strlen(scoreToChar) + 1;
+	fwrite(&sizeOfNum, sizeof(unsigned short), 1, fp);		//the string length + 1 for the null terminator
+	fwrite(scoreToChar, sizeof(char), sizeOfNum, fp);		//write the string
+
+    fclose(fp);
+}
+
+void writeToFileMOV(int score){
+    char scoreToChar[3];
+    sprintf(scoreToChar, "%ld", score);
+    
+	// file writing -- highscores 
+	fp = fopen("highsm.bin", "ab");
+
+	// // writing nung name nung player
+	unsigned short sizeOfString = strlen(name) + 1;
+	fwrite(&sizeOfString, sizeof(unsigned short), 1, fp);	//the string length + 1 for the null terminator
+	fwrite(name, sizeof(char), sizeOfString, fp);			//write the string
+
+	// writing nung score nung player
+	unsigned short sizeOfNum = strlen(scoreToChar) + 1;
+	fwrite(&sizeOfNum, sizeof(unsigned short), 1, fp);		//the string length + 1 for the null terminator
+	fwrite(scoreToChar, sizeof(char), sizeOfNum, fp);		//write the string
+
+    fclose(fp);
+}
+
+void freeMallocsPKMN(){
+    temp = headPKMN;
+    while( (temp -> next != NULL) ){
+        temp = temp -> next;
+        free(temp);
+    }
+}
+
+void readHighScorePKMN(){
+	// file reading -- highscores
+	fp = fopen("highsp.bin", "rb");  
+
+	// insert dummy node: the code shall perform insertion sort (descending order of scores)
+	newNode = (highScoreNode *) malloc ( sizeof(highScoreNode) );
+	newNode -> name = "dummy";
+	newNode -> score = 1000000;
+	newNode -> next = NULL;
+	headPKMN = newNode;
+
+	while(!feof(fp)){
+		// freading nung name
+		unsigned short stringLength = 0;
+		fread(&stringLength, sizeof(unsigned short), 1, fp); // for the end character
+		char * nameRead = malloc(sizeof(char) * stringLength);
+		int count = fread(nameRead, sizeof(char), stringLength, fp); // the string itself
+
+		// freading nung score mismo
+		unsigned short numLength = 0;
+		fread(&numLength, sizeof(unsigned short), 1, fp); // for the end character
+		char * scoreRead = malloc(sizeof(char) * numLength);
+		int count2 = fread(scoreRead, sizeof(char), numLength, fp); // the string itself
+
+		// int score;
+
+		// due to some reasons, may sobrang nareread yung fread, ito yung pantanggal nun
+		if(strcmp(nameRead,scoreRead) != 0){
+            int score = atoi(scoreRead);
+			// sscanf(scoreRead, "%d", &score);
+		
+			// node creation
+			newNode = (highScoreNode *) malloc ( sizeof(highScoreNode) );
+			newNode -> name = nameRead;
+			newNode -> score = score;
+			newNode -> next = NULL;
+
+			// insertion sort :: decreasing order
+			temp = headPKMN;
+			while( (temp -> next != NULL) && (temp -> next -> score > newNode -> score) ){
+				temp = temp -> next;
+			}
+			newNode -> next = temp -> next;
+			temp -> next = newNode;
+		}
+	}
+}
+
+void freeMallocsMOV(){
+    temp = headMOV;
+    while( (temp -> next != NULL) ){
+        temp = temp -> next;
+        free(temp);
+    }
+}
+
+void readHighScoreMOV(){
+	// file reading -- highscores
+	fp = fopen("highsm.bin", "rb");  
+
+	// insert dummy node: the code shall perform insertion sort (descending order of scores)
+	newNode = (highScoreNode *) malloc ( sizeof(highScoreNode) );
+	newNode -> name = "dummy";
+	newNode -> score = 1000000;
+	newNode -> next = NULL;
+	headMOV = newNode;
+
+	while(!feof(fp)){
+		// freading nung name
+		unsigned short stringLength = 0;
+		fread(&stringLength, sizeof(unsigned short), 1, fp); // for the end character
+		char * nameRead = malloc(sizeof(char) * stringLength);
+		int count = fread(nameRead, sizeof(char), stringLength, fp); // the string itself
+
+		// freading nung score mismo
+		unsigned short numLength = 0;
+		fread(&numLength, sizeof(unsigned short), 1, fp); // for the end character
+		char * scoreRead = malloc(sizeof(char) * numLength);
+		int count2 = fread(scoreRead, sizeof(char), numLength, fp); // the string itself
+
+		// int score;
+
+		// due to some reasons, may sobrang nareread yung fread, ito yung pantanggal nun
+		if(strcmp(nameRead,scoreRead) != 0){
+            int score = atoi(scoreRead);
+			// sscanf(scoreRead, "%d", &score);
+		
+			// node creation
+			newNode = (highScoreNode *) malloc ( sizeof(highScoreNode) );
+			newNode -> name = nameRead;
+			newNode -> score = score;
+			newNode -> next = NULL;
+
+			// insertion sort :: decreasing order
+			temp = headMOV;
+			while( (temp -> next != NULL) && (temp -> next -> score > newNode -> score) ){
+				temp = temp -> next;
+			}
+			newNode -> next = temp -> next;
+			temp -> next = newNode;
+		}
+	}
+}
+
 void highScore(){   
-    char line[30][35];
-    int linebreak = 20, skip;
-    int i,j;
+	int i = 0, increment = 20, j = 2;
+    readHighScorePKMN();
+
+    // char line[30][35];
+    // int linebreak = 20, skip;
+    // int i,j;
 
     // mainMenu
     // drawRectangle(0,0,320,220, GRAY);
-    strcpy(line[0], "HIGH SCORES");
+    write_text("HIGH SCORES!",110,20,CYAN,1);
+    write_text("Press any key to continue...",35,170,GRAY,0);
 
-    // category 1
-    strcpy(line[1], "Pokemon Category");
+    // catogory 1
+	write_text("Pokemon",40,40,YELLOW,1);
+    // traversing the linked list :: top 5 db??
+	temp = headPKMN;
+	while(temp != NULL){
+		if(i!=0){
+            write_text(temp -> name,20,50+increment,WHITE,0);
+
+            char scoreToCharPKMN[3];
+            sprintf(scoreToCharPKMN, "%ld", temp -> score);
+            write_text(scoreToCharPKMN,100,50+increment,YELLOW,0);
+
+            increment+=20;
+            char stop = (char)getch();
+		}
+		
+		temp = temp -> next;
+		i++;
+	}
+
+    readHighScoreMOV();
+    // catogory 2
+	write_text("Movies",230,40,CYAN,1);
     // top 5
-    strcpy(line[2], "Player 1");
-    strcpy(line[3], "Player 2");
-    strcpy(line[4], "Player 3");
-    strcpy(line[5], "Player 4");
-    strcpy(line[6], "Player 5");
+    // traversing the linked list :: top 5 db??
+	temp = headMOV;
+    i = 0;
+	while(temp != NULL){
+		if(i!=0){
+            write_text(temp -> name,180,50+increment,WHITE,0);
+
+            char scoreToCharMov[3];
+            sprintf(scoreToCharMov, "%ld", temp -> score);
+            write_text(scoreToCharMov,260,50+increment,YELLOW,0);
+
+            increment+=20;
+            char stop = (char)getch();
+		}
+		
+		temp = temp -> next;
+		i++;
+	}
+
+    char keypress=(char)getch();
+
+
+    // strcpy(line[2], "Player 1");
+    // strcpy(line[3], "Player 2");
+    // strcpy(line[4], "Player 3");
+    // strcpy(line[5], "Player 4");
+    // strcpy(line[6], "Player 5");
 
     // category 2
-    strcpy(line[7], "Movie Category");
+    // strcpy(line[7], "Movie Category");
     // top 5
-    strcpy(line[8], "Player 1");
-    strcpy(line[9], "Player 2");
-    strcpy(line[10], "Player 3");
-    strcpy(line[11], "Player 4");
-    strcpy(line[12], "Player 5");
+    // strcpy(line[8], "Player 1");
+    // strcpy(line[9], "Player 2");
+    // strcpy(line[10], "Player 3");
+    // strcpy(line[11], "Player 4");
+    // strcpy(line[12], "Player 5");
     //return option
-    strcpy(line[13], "[Press any key to return]");
+    // strcpy(line[13], "[Press any key to return]");
     
-    write_text(line[0], 115, 20, CYAN, 1);   //display high scores
+    // write_text(line[0], 115, 20, CYAN, 1);   //display high scores
 
-    write_text(line[1], 20, 45, BLACK, 0);       //display category title (Pokemon)
-    for(i=2; i<=6; i++){                         //display players
-        write_text(line[i], 25, 50+linebreak, WHITE, -1);
-        linebreak+=20;
-    }
+    // write_text(line[1], 20, 45, BLACK, 0);       //display category title (Pokemon)
+    // for(i=2; i<=6; i++){                         //display players
+    //     write_text(line[i], 25, 50+linebreak, WHITE, -1);
+    //     linebreak+=20;
+    // }
 
-    linebreak = 20, skip;
-    write_text(line[7], 175, 45, BLACK, 0);     //display category title (Movie)
-    for(j=8; j<=12; j++){                       //display players
-        write_text(line[j], 180, 50+linebreak, WHITE, -1);
-        linebreak+=20;
-    }
+    // linebreak = 20, skip;
+    // write_text(line[7], 175, 45, BLACK, 0);     //display category title (Movie)
+    // for(j=8; j<=12; j++){                       //display players
+    //     write_text(line[j], 180, 50+linebreak, WHITE, -1);
+    //     linebreak+=20;
+    // }
 
-    write_text(line[13], 40, 180, CYAN, 0);     //display return option  
-    char stop = (char)getch();  
+    // write_text(line[13], 40, 180, CYAN, 0);     //display return option  
+    // char stop = (char)getch();  
 }
 
 void wrongInput(){
@@ -532,18 +735,17 @@ void instructionsPanel(){
 
     write_text("Navigation",20,40,CYAN,0);
     write_text("Press the key inside square",20,50,WHITE,0);
-    write_text("brackets \"[\" and \"]\" to go that",20,60,WHITE,0);
-    write_text("specific menu. ",20,70,WHITE,0);
+    write_text("brackets \"[\" and \"]\".",20,60,WHITE,0);
 
-    write_text("Game Proper",20,90,CYAN,0);
-    write_text("Your name will be asked first.",20,100,WHITE,0);
-    write_text("You can enter lower and uppercase",20,110,WHITE,0);
-    write_text("letters, as well as numbers, and",20,120,WHITE,0);
-    write_text("some symbols. If the character is",20,130,WHITE,0);
-    write_text("not recognized, changes will not",20,140,WHITE,0);
-    write_text("be reflected. You cannot use",20,150,WHITE,0);
-    write_text("backspace. This is a quiz bee",20,160,WHITE,0);
-    write_text("program, not some text editor.",20,170,WHITE,0);
+    write_text("Game Proper",20,80,CYAN,0);
+    write_text("Your name will be asked first.",20,90,WHITE,0);
+    write_text("You can enter lower & uppercase",20,100,WHITE,0);
+    write_text("letters, numbers, and symbols",20,110,WHITE,0);
+    write_text("If the character is not",20,120,WHITE,0);
+    write_text("recognized, nothing happens.",20,130,WHITE,0);
+    write_text("You cannot use backspace.",20,140,WHITE,0);
+    write_text("This is a quiz bee program",20,150,WHITE,0);
+    write_text("not some text editor.",20,160,WHITE,0);
 
     write_text("Press any key to continue...",40,180,GRAY,0);
     char stop = (char)getch();
@@ -558,9 +760,9 @@ void instructionsPanel(){
     write_text("(5) questions per level.",20,70,WHITE,0);
 
     write_text("Scoring System",20,90,CYAN,0);
-    write_text("two (2) for easy",20,100,WHITE,0);
-    write_text("three (3) for average",20,110,WHITE,0);
-    write_text("five (5) for difficult",20,120,WHITE,0);
+    write_text("two (2)   == easy",20,100,WHITE,0);
+    write_text("three (3) == average",20,110,WHITE,0);
+    write_text("five (5)  == difficult",20,120,WHITE,0);
 
     write_text("Answering",20,140,CYAN,0);
     write_text("Press [a] [b] [c] or [d] to ",20,150,WHITE,0);
@@ -578,8 +780,8 @@ void instructionsPanel(){
     write_text("Your score will be recorded.",20,60,WHITE,0);
 
     write_text("Power Up",20,80,CYAN,0);
-    write_text("You are granted three ",20,90,WHITE,0);
-    write_text("charges of skips - this skips",20,100,WHITE,0);
+    write_text("You are granted three charges",20,90,WHITE,0);
+    write_text("of skips [s] - this skips",20,100,WHITE,0);
     write_text("a question, resulting to a",20,110,WHITE,0);
     write_text("correct answer. Once empty, ",20,120,WHITE,0);
     write_text("it can no longer be used.",20,130,WHITE,0);

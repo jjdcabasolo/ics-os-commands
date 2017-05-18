@@ -14,13 +14,19 @@ void displayRandomizedNumber(int limit);
 void chooseFileToRead(int i, char categoryChar);
 void setSettingsForDifficulty(int i);
 void instructionsPanel();
-
 int mayTamaKa(int score, int increment);                // prompts the user that he/she got the correct answer
 void betterLuckNextTime();    // prompts the user that he/she got the wrong answer
 void wrongInput();        // displays the highscores
 void quitter();     // displays the window if the user quits in the middle of the game
 int gumamitNgPowerUp(int score, int increment);
 void walaNaTamaNa();
+
+void writeToFilePKMN(int score);
+void writeToFileMOV(int score);
+void readHighScorePKMN();
+void freeMallocsPKMN();
+void readHighScoreMOV();
+void freeMallocsMOV();
 
 int ezPanel();          // baka naman i-mali mo pa!?
 int avePanel();     // kebs lang. 
@@ -88,9 +94,16 @@ void erase();               // basically covers an area with a black rectangle
 #define GRAY 56
 #define WHITE 63
 
+typedef struct highScoreEntry{
+	char * name;
+	int score;
+	struct highScoreEntry * next;
+} highScoreNode;
+
 // GLOBAL VARIABLES
-char name[8], rightAnswerText[16], answer1[16], answer2[16], answer3[16], answer4[16], correctAnswer[2];
+char name[9], rightAnswerText[16], answer1[16], answer2[16], answer3[16], answer4[16], correctAnswer[2];
 char rightAnswer, wrongAnswer1, wrongAnswer2, wrongAnswer3;
 int randomNumArray[10];
 int limit = 0, increment = 0, randomNumberIndex = 1, flag = 0, skipCount = 3;
 FILE * fp;
+highScoreNode * newNode = NULL, * headPKMN = NULL, * headMOV = NULL, * temp = NULL;
