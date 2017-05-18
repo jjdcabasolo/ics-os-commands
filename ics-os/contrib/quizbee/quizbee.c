@@ -740,12 +740,12 @@ void instructionsPanel(){
     write_text("Game Proper",20,80,CYAN,0);
     write_text("Your name will be asked first.",20,90,WHITE,0);
     write_text("You can enter lower & uppercase",20,100,WHITE,0);
-    write_text("letters, numbers, and symbols",20,110,WHITE,0);
+    write_text("letters, numbers, and symbols.",20,110,WHITE,0);
     write_text("If the character is not",20,120,WHITE,0);
     write_text("recognized, nothing happens.",20,130,WHITE,0);
-    write_text("You cannot use backspace.",20,140,WHITE,0);
-    write_text("This is a quiz bee program",20,150,WHITE,0);
-    write_text("not some text editor.",20,160,WHITE,0);
+    write_text("You cannot use backspace. This",20,140,WHITE,0);
+    write_text("is a quiz bee program, not",20,150,WHITE,0);
+    write_text("some text editor.",20,160,WHITE,0);
 
     write_text("Press any key to continue...",40,180,GRAY,0);
     char stop = (char)getch();
@@ -755,9 +755,9 @@ void instructionsPanel(){
 	write_text("Instructions",20,20,CYAN,1);
 
     write_text("There will be three levels of",20,40,WHITE,0);
-    write_text("difficulty, which will be covered",20,50,WHITE,0);
-    write_text("in a session. There will be five",20,60,WHITE,0);
-    write_text("(5) questions per level.",20,70,WHITE,0);
+    write_text("difficulty, which will be ",20,50,WHITE,0);
+    write_text("covered in a session. There will",20,60,WHITE,0);
+    write_text("be five (5) questions per level.",20,70,WHITE,0);
 
     write_text("Scoring System",20,90,CYAN,0);
     write_text("two (2)   == easy",20,100,WHITE,0);
